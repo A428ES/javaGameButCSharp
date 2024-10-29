@@ -1,8 +1,9 @@
 using System;
+using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     interface StateManagement{
-        public void read(StatefulObject statefulObject);
+        public StatefulObject read(string filePath, OptionMap type);
         public void write(StatefulObject statefulObject);
     }
 }
