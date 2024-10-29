@@ -1,26 +1,14 @@
 using System;
-using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     class StatefulObject{
-        public StatefulObject(OptionMap objectType){
-            switch(objectType){
-                case EVENT:
-                    Console.WriteLine("event");
-                break;
+        string fileName {get;}
+        string type {get;}
 
-                case LOCATION:
-                    Console.WriteLine("location");
-                break;
-
-                case ENTITY:
-                    Console.WriteLine("entity");
-                break;
-
-                default:
-                    Console.WriteLine("default");
-                break;
-            }
+        public StatefulObject(string fileName, string type){
+            this.fileName = fileName;
+            this.type = type;
         }
+
     }
 }
