@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json;
+using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     class JsonStateManagement : StateManagement{
@@ -8,8 +10,19 @@ namespace JavaGameButCSharp{
             this.saveLoadManagement = saveLoadManagement;
         }
         
-        public void read(StatefulObject statefulObject){
+        public StatefulObject read(string filePath, OptionMap type){
+            if(!File.Exists(filePath)){
+                throw new ResourceNotFound(filePath);
+            }
 
+            string jsonData = File.ReadAllText(filePath);
+
+            return type switch {
+                ENTITY => JsonSerializer.Deserialize<Entity>(jsonData),
+                LOCATION => JsonSerializer.Deserialize<Location>(jsonData),
+                EVENT => JsonSerializer.Deserialize<Event>(jsonData),
+                _ => throw new JsonException($"Unknown type: {type}")
+            };
         }
 
         public void write(StatefulObject statefulObject){
