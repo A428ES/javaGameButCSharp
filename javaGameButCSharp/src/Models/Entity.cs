@@ -1,7 +1,7 @@
 using System;
 
 namespace JavaGameButCSharp{
-    abstract class Entity{
+    abstract class Entity : StatefulObject{
         private string name;
         private int health;
         private string location;
@@ -9,7 +9,8 @@ namespace JavaGameButCSharp{
         private int speed;
         private int money;
         private Inventory inventory;
-        public Entity(){
+        public Entity(string fileName) : base(fileName, "ENTITY"){
+            
         }
     }
 }
