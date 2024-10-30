@@ -4,33 +4,24 @@ using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     class JsonStateManagement : StateManagement{
-        SaveLoadManagement saveLoadManagement {get;}
 
-        public JsonStateManagement(SaveLoadManagement saveLoadManagement){
-            this.saveLoadManagement = saveLoadManagement;
+        public JsonStateManagement(){
         }
         
-        public StatefulObject read(string filePath, OptionMap type){
-            if(!File.Exists(filePath)){
+        public T Read<T>(string filePath) where T : StatefulObject
+        {
+            if (!File.Exists(filePath))
+            {
                 throw new ResourceNotFound(filePath);
             }
 
             string jsonData = File.ReadAllText(filePath);
-
-            return type switch {
-                ENTITY => JsonSerializer.Deserialize<Entity>(jsonData),
-                LOCATION => JsonSerializer.Deserialize<Location>(jsonData),
-                EVENT => JsonSerializer.Deserialize<Event>(jsonData),
-                _ => throw new JsonException($"Unknown type: {type}")
-            };
+            return JsonSerializer.Deserialize<T>(jsonData) 
+                ?? throw new JsonException($"Failed to deserialize {typeof(T).Name}");
         }
-
-        public void write(StatefulObject statefulObject){
+        public void Write(StatefulObject statefulObject){
 
         }
     }
-
-
-
 
 }
