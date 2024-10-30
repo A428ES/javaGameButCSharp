@@ -3,7 +3,7 @@ using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     interface StateManagement{
-        public StatefulObject read(string filePath, OptionMap type);
-        public void write(StatefulObject statefulObject);
+        public T Read<T>(string filePath) where T : StatefulObject;
+        public void Write(StatefulObject statefulObject);
     }
 }
