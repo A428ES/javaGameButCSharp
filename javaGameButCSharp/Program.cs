@@ -1,13 +1,18 @@
 ﻿using System;
+using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     public class MainGame{
         static void Main(){
-            string test = "hello";
+            SaveLoadManagement saveLoad = new SaveLoadManagement();
+            JsonStateManagement jsonManager = new JsonStateManagement();
 
-            if(test.Equals("hello")){
-                Console.WriteLine("world");
-            }
+            saveLoad.NewSave("NEWGAME");
+
+            string userLoadPath = saveLoad.GetStatePath(ENTITY, "PLAYER");
+            Entity player = jsonManager.Read<Entity>(userLoadPath);
+
+            Console.WriteLine(player.Inventory.EntityInventory[0].Type);
         }
     }
 }
