@@ -1,14 +1,22 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace JavaGameButCSharp{
     class Item{
-        private int modifier {get;}
-        private int condition {get;}
-        private int value {get;}
-        private string type{get;}
+        [JsonPropertyName("modifier")]
+        public int Modifier {get; set;}
 
-        Item(){
+        [JsonPropertyName("condition")]
+        public int Condition {get; set;}
 
+        [JsonPropertyName("value")]
+        public int Value {get; set;}
+
+        [JsonPropertyName("type")]
+        public string Type {get; set;}
+
+        public Item(){
+            this.Type = String.Empty;
         }
     }
 }
