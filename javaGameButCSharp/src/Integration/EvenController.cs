@@ -19,10 +19,8 @@ namespace JavaGameButCSharp{
         }
 
         public void RunNextEvent(){
-            EventSupporter processEvent = new EventSupporter();
-            Event eventToRun = new(CurrentEvent.EventType.ToString());
-
-            processEvent.RunEvent(eventToRun);
+            EventSupporter processEvent = new();
+            // processEvent.RunEvent(eventToRun);
 
             LastEvent.EventOutCome = processEvent.EventOutCome;
             CurrentEvent = processEvent.NextEvent;
