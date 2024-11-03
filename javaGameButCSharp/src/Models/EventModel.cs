@@ -5,7 +5,7 @@ namespace JavaGameButCSharp{
     {
         public OptionMap EventType { get; }
         public string EventTarget { get; }
-        public OptionMap EventOutCome {get;}
+        public OptionMap EventOutCome {get;set;}
         
         public static EventModel Copy(EventModel toCopy){
             return new EventModel(toCopy.EventType, toCopy.EventOutCome, toCopy.EventTarget);
