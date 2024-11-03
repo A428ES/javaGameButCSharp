@@ -4,7 +4,6 @@ namespace JavaGameButCSharp{
     class EventController{
         public EventModel CurrentEvent {get;set;}
         public EventModel LastEvent {get;set;}
-        private readonly EventSupporter EventSupporter;
         private readonly JsonStateManagement jsonStateManagement;
         private readonly SaveLoadManagement saveLoadManagement;
         public Entity ActivePlayer;
@@ -17,12 +16,16 @@ namespace JavaGameButCSharp{
             this.LastEvent = EventModel.Copy(currentEvent);
             this.ActiveLocation = new Location();
             this.ActivePlayer = new Entity();
-
-            EventSupporter = new EventSupporter();
         }
 
         public void RunNextEvent(){
-            Event eventRun = new(CurrentEvent.EventType.ToString());
+            EventSupporter processEvent = new EventSupporter();
+            Event eventToRun = new(CurrentEvent.EventType.ToString());
+
+            processEvent.RunEvent(eventToRun);
+
+            LastEvent.EventOutCome = processEvent.EventOutCome;
+            CurrentEvent = processEvent.NextEvent;
         }
     }
 }
