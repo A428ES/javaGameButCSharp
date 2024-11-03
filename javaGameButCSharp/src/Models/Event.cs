@@ -1,19 +1,32 @@
 using System;
+using System.Text.Json.Serialization;
 using static JavaGameButCSharp.OptionMap;
 
 
 namespace JavaGameButCSharp{
-    class Event : StatefulObject{
+    abstract class Event : StatefulObject{
+        [JsonPropertyName("name")] 
+        public string Name {get;set;} = String.Empty;
 
-        public EventModel eventModel {get;}
+        [JsonPropertyName("eventText")]
+        public string EventText {get;set;} = String.Empty;
 
-        public OptionMap result {get;}
+        [JsonPropertyName("inputOptions")]
+        public List<String> InputOptions { get; set; } = [];
 
-        public Event(string fileName): base(fileName, EVENT){
+        public EventModel Model {get;set;}
+
+        public OptionMap Result {get;}
+
+        public Event(EventModel eventModel): base(eventModel.EventType.ToString(), EVENT){
+            Model = eventModel;
+            Result = eventModel.EventOutCome;
         }
 
-        public Event(){
-            
-        }
+        public static void LoadTarget(Entity target) => throw new Exception("Not implemented");
+        public static void LoadTarget(Location target) => throw new Exception("Not implemented");
+        public abstract void PrintOptions();
+        public abstract void RecordSelection();
+        public abstract void PrintOutcome();
     }
 }
