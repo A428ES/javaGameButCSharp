@@ -1,25 +1,25 @@
 namespace JavaGameButCSharp{
-    class MenuEvent : Event
+    class MenuEvent : Event, IEventFeed
     {
         public MenuEvent(EventModel eventModel) : base(eventModel)
         {
         }
 
-        public MenuEvent() : base(new EventModel(OptionMap.ENTITY)){
+        public MenuEvent(){
 
         }
 
-        public override void PrintOptions()
+        public void PrintOptions()
         {
             throw new NotImplementedException();
         }
 
-        public override void PrintOutcome()
+        public void PrintOutcome()
         {
             throw new NotImplementedException();
         }
 
-        public override void RecordSelection()
+        public void RecordSelection()
         {
             throw new NotImplementedException();
         }
