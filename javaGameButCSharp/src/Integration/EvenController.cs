@@ -4,20 +4,18 @@ namespace JavaGameButCSharp{
     class EventController{
         public EventModel CurrentEvent {get;set;}
         public EventModel LastEvent {get;set;}
-        private readonly JsonStateManagement jsonStateManagement;
-        private readonly SaveLoadManagement saveLoadManagement;
         private readonly EventSupporter _eventSupporter;
+        private readonly InputOutManager _IO;
         public Entity ActivePlayer;
         public Location ActiveLocation;
     
-        public EventController(JsonStateManagement stateManagement, SaveLoadManagement saveLoad, EventModel currentEvent){
-            this.jsonStateManagement = stateManagement;
-            this.saveLoadManagement = saveLoad;
+        public EventController(StateManagement stateManagement, SaveLoadManagement saveLoad, EventModel currentEvent){
             this.CurrentEvent = currentEvent;
             this.LastEvent = EventModel.Copy(currentEvent);
-            this._eventSupporter = new EventSupporter(stateManagement, saveLoad);
             this.ActiveLocation = new Location();
             this.ActivePlayer = new Entity();
+            this._IO = new InputOutManager();
+            this._eventSupporter = new EventSupporter(stateManagement, saveLoad, _IO);
         }
 
         public void RunNextEvent(){
@@ -25,6 +23,15 @@ namespace JavaGameButCSharp{
 
             LastEvent.EventOutCome = _eventSupporter.EventOutCome;
             CurrentEvent = _eventSupporter.NextEvent;
+        }
+
+        public void ReturnToMenu(){
+            CurrentEvent = new EventModel(MENU_EVENT);
+            QuickResolveEvent();
+        }
+
+        public void QuickResolveEvent(){
+            LastEvent.EventOutCome = EVENT_COMPLETE;
         }
     }
 }
