@@ -13,8 +13,14 @@ namespace JavaGameButCSharp{
 
         public EventModel(OptionMap type){
             this.EventType = type;
-            this.EventOutCome = IN_PROGRESS;
+            this.EventOutCome = EVENT_IN_PROGRESS;
             this.EventTarget = string.Empty;
+        }
+
+        public EventModel(OptionMap type, string target){
+            this.EventType = type;
+            this.EventTarget = target;
+            this.EventOutCome = EVENT_IN_PROGRESS;
         }
 
         public EventModel(OptionMap type, OptionMap outcome, string target){
