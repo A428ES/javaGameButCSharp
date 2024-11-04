@@ -1,22 +1,23 @@
-using System.IO.Compression;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     class EventSupporter{
-        private readonly JsonStateManagement _stateManagement;
+        private readonly StateManagement _stateManagement;
         private readonly SaveLoadManagement _saveLoad;
-        private readonly Event _workingEvent;
-        public EventModel NextEvent {get;}
-        public OptionMap EventOutCome {get;}
+        private readonly InputOutManager _IO;
+        private Event _workingEvent;
+        public EventModel NextEvent {get;set;}
+        public OptionMap EventOutCome {get;set;}
 
 
-        public EventSupporter(JsonStateManagement stateManagement, SaveLoadManagement saveLoad){
+        public EventSupporter(StateManagement stateManagement, SaveLoadManagement saveLoad, InputOutManager IO){
             _stateManagement = stateManagement;
             _saveLoad = saveLoad;
             _workingEvent = new MenuEvent();
+            _IO = IO;
 
             NextEvent = new EventModel(EVENT);
-            EventOutCome = IN_PROGRESS;
+            EventOutCome = EVENT_IN_PROGRESS;
         }
 
         public Event LoadEvent(EventModel nextEvent){
@@ -25,9 +26,10 @@ namespace JavaGameButCSharp{
             return _stateManagement.Read<Event>(eventPath);
         }
 
-
         public void Menu(){
+            MainMenuEventSupporter menuSupport = new(_workingEvent, _IO);
 
+            NextEvent = menuSupport.Routing();
         }
 
         public void Battle(){
@@ -42,8 +44,8 @@ namespace JavaGameButCSharp{
 
         }
 
-        public EventModel RunEvent(EventModel nextEvent){
-            Event workingEvent = LoadEvent(nextEvent);
+        public void RunEvent(EventModel nextEvent){
+            _workingEvent = LoadEvent(nextEvent);
 
             switch(nextEvent.EventType){
                 case MENU_EVENT:
@@ -60,8 +62,6 @@ namespace JavaGameButCSharp{
                     break;
 
             }
-
-            return new EventModel(MENU, REPEAT, "TEST");
         }
     }
 }
