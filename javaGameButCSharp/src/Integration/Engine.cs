@@ -1,10 +1,9 @@
-using System.ComponentModel.Design;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     class Engine{
         private readonly SaveLoadManagement SaveLoad;
-        private readonly JsonStateManagement StateManagement;
+        private readonly StateManagement StateManagement;
         private readonly EventController EventController;
         private bool EngineRunning;
         private Entity ActivePlayer;
@@ -15,7 +14,7 @@ namespace JavaGameButCSharp{
             SaveLoad = new SaveLoadManagement();
             StateManagement = new JsonStateManagement();
 
-            EventModel firstEvent = new(MENUEVENT);
+            EventModel firstEvent = new(MENU_EVENT);
             ActivePlayer = new Entity();
             ActiveLocation = new Location();
             EventController = new EventController(StateManagement, SaveLoad,firstEvent);
@@ -35,32 +34,54 @@ namespace JavaGameButCSharp{
             SaveLoad.NewSave(newPlayer);
 
             LoadPlayer(newPlayer);
+            
+            ActivePlayer.Name = newPlayer;
+            StateManagement.Write(SaveLoad.GetStatePath(ENTITY, "PLAYER"), ActivePlayer);
         }
 
-        public Location UpdateLocation(string newLocation) => ActiveLocation = new Location(newLocation);
+        public void LoadStats(){
+            Console.WriteLine(EventController.ActivePlayer.Name);
+            Console.WriteLine(EventController.ActivePlayer.Health);
+        }
+
+        public void UpdateLocation(string newLocation) {
+            string locationPath = SaveLoad.GetStatePath(LOCATION, newLocation);
+            
+            ActiveLocation =  StateManagement.Read<Location>(locationPath);
+            EventController.ActiveLocation = ActiveLocation;
+        }
 
         private void StopEngine() => EngineRunning = false;
 
         public void EventIntegration(){
-            switch(EventController.LastEvent?.EventOutCome){
-                case NEW_GAME:
+            switch(EventController.CurrentEvent.EventType){
+                case NEW:
+                    NewPlayer(EventController.CurrentEvent.EventTarget);
                 break;
 
-                case LOAD_GAME:
+                case LOAD:
+                    LoadPlayer(EventController.CurrentEvent.EventTarget);
                 break;
 
+                case STATS:
+                    LoadStats();
+                break;
+            
                 case UPDATE_LOCATION:
-                    UpdateLocation(EventController.LastEvent.EventTarget);
+                    UpdateLocation(EventController.CurrentEvent.EventTarget);
                 break;
 
-                case EXIT_ENGINE:
+                case EXIT:
                     StopEngine();
                 break;
                 
                 default:
                     EventController.RunNextEvent();
-                break;
+
+                    return;
             }
+
+            EventController.ReturnToMenu();
         }
 
         public void EngineLoop(){
@@ -75,6 +96,8 @@ namespace JavaGameButCSharp{
                     Console.WriteLine(e.Message);
                 }
             }
+
+            Console.WriteLine("Thank you for playing! GOOD BYE!");
         }
     }
 }
