@@ -4,7 +4,7 @@ using static JavaGameButCSharp.OptionMap;
 
 
 namespace JavaGameButCSharp{
-    abstract class Event : StatefulObject{
+    class Event : StatefulObject{
         [JsonPropertyName("name")] 
         public string Name {get;set;} = String.Empty;
 
@@ -23,10 +23,11 @@ namespace JavaGameButCSharp{
             Result = eventModel.EventOutCome;
         }
 
+        public Event(){
+
+        }
+
         public static void LoadTarget(Entity target) => throw new Exception("Not implemented");
         public static void LoadTarget(Location target) => throw new Exception("Not implemented");
-        public abstract void PrintOptions();
-        public abstract void RecordSelection();
-        public abstract void PrintOutcome();
     }
 }
