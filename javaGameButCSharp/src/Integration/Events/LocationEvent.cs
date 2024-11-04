@@ -1,5 +1,5 @@
 namespace JavaGameButCSharp{
-    class LocationEvent : Event{
+    class LocationEvent : Event, IEventFeed{
         private readonly Entity _activePlayer;
         private readonly Location _activeLocation;
 
@@ -12,17 +12,17 @@ namespace JavaGameButCSharp{
             return new EventModel(OptionMap.EVENT);
         }
 
-        public override void PrintOptions()
+        public void PrintOptions()
         {
             throw new NotImplementedException();
         }
 
-        public override void RecordSelection()
+        public void RecordSelection()
         {
             throw new NotImplementedException();
         }
 
-        public override void PrintOutcome()
+        public void PrintOutcome()
         {
             throw new NotImplementedException();
         }
