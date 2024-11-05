@@ -1,18 +1,22 @@
-using System;
+using System.Text.Json.Serialization;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    class SaveLoadManagement{
-        public readonly string GamePath;
-        public string GameTemplates;
-        public string LoadedUserPath;
-        public string LoadedUser;
+    class SaveLoadManagement : StatefulObject{
+        [JsonPropertyName("gamepath")]
+        public string GamePath {get;set;} = string.Empty;
+        [JsonPropertyName("templates")]
+        public string GameTemplates {get;set;} = string.Empty;
+        [JsonPropertyName("extension")]
+        public string Extension {get;set;} = string.Empty;
+        public string LoadedUserPath = string.Empty;
+        public string LoadedUser = string.Empty;
 
         public SaveLoadManagement(){
-            this.GamePath = @"C:\javaGameEvolution";
-            this.GameTemplates = $@"{GamePath}\GameSaveTemplate";
-            this.LoadedUser = String.Empty;
-            this.LoadedUserPath = String.Empty;
+        }
+
+        public void LoadConfig(){
+            GameTemplates = Path.Combine(GamePath, GameTemplates);
         }
 
         public void LoadUser(string loadUser){
@@ -22,14 +26,23 @@ namespace JavaGameButCSharp{
 
         public string GetStatePath(OptionMap type, string fileName){
             if(type == EVENT){
-                return $@"{GamePath}\{type}\{fileName}.json";
+                return $@"{GamePath}\{type}\{fileName.ToUpper()}.{Extension}";
             }
 
-            return $@"{LoadedUserPath}\{type}\{fileName}.json";
+            return $@"{LoadedUserPath}\{type}\{fileName.ToUpper()}.{Extension}";
         }
 
         public void NewSave(string saveName){
+            if(saveName.Equals(string.Empty)){
+                throw new InvalidInput("Failure to recognize user input");
+            }
+
             LoadUser(saveName);
+
+            if(Directory.Exists(LoadedUserPath)){
+                throw new InvalidInput("This save already exists");
+            }
+
             FileManagement.CopyDirectory(GameTemplates, LoadedUserPath);
         }
 

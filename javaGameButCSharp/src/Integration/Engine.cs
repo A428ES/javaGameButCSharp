@@ -2,98 +2,52 @@ using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
     class Engine{
-        private readonly SaveLoadManagement SaveLoad;
-        private readonly StateManagement StateManagement;
-        private readonly EventController EventController;
-        private bool EngineRunning;
-        private Entity ActivePlayer;
-        private Location ActiveLocation;
+        private readonly EventController _eventController;
+        private GameStateController _gameState;
+        private bool _engineRunning;
 
-        public Engine(){
-            EngineRunning = true;
-            SaveLoad = new SaveLoadManagement();
-            StateManagement = new JsonStateManagement();
+        public Engine(string bootPath){
+            _engineRunning = true;
 
-            EventModel firstEvent = new(MENU_EVENT);
-            ActivePlayer = new Entity();
-            ActiveLocation = new Location();
-            EventController = new EventController(StateManagement, SaveLoad,firstEvent);
-        }
-
-        public void LoadPlayer(string playerName){
-            SaveLoad.LoadUser(playerName);
-
-            ActivePlayer = StateManagement.Read<Entity>(SaveLoad.GetStatePath(ENTITY, "PLAYER"));
-            UpdateLocation(ActivePlayer.Location);
-
-            EventController.ActivePlayer = ActivePlayer;
-            EventController.ActiveLocation = ActiveLocation;
-        }
-
-        public void NewPlayer(string newPlayer){
-            SaveLoad.NewSave(newPlayer);
-
-            LoadPlayer(newPlayer);
+            StateManagement stateManagement = new JsonStateManagement();
+            SaveLoadManagement saveLoad = stateManagement.Read<SaveLoadManagement>(bootPath);
+            saveLoad.LoadConfig();
             
-            ActivePlayer.Name = newPlayer;
-            StateManagement.Write(SaveLoad.GetStatePath(ENTITY, "PLAYER"), ActivePlayer);
+            _gameState = new GameStateController(saveLoad, stateManagement);
+            _eventController = new EventController(stateManagement, saveLoad, _gameState);
         }
 
-        public void LoadStats(){
-            Console.WriteLine(EventController.ActivePlayer.Name);
-            Console.WriteLine(EventController.ActivePlayer.Health);
-        }
-
-        public void UpdateLocation(string newLocation) {
-            string locationPath = SaveLoad.GetStatePath(LOCATION, newLocation);
-            
-            ActiveLocation =  StateManagement.Read<Location>(locationPath);
-            EventController.ActiveLocation = ActiveLocation;
-        }
-
-        private void StopEngine() => EngineRunning = false;
+        private void StopEngine() => _engineRunning = false;
 
         public void EventIntegration(){
-            switch(EventController.CurrentEvent.EventType){
-                case NEW:
-                    NewPlayer(EventController.CurrentEvent.EventTarget);
-                break;
-
-                case LOAD:
-                    LoadPlayer(EventController.CurrentEvent.EventTarget);
-                break;
-
-                case STATS:
-                    LoadStats();
-                break;
-            
-                case UPDATE_LOCATION:
-                    UpdateLocation(EventController.CurrentEvent.EventTarget);
-                break;
-
+            switch(_eventController.CurrentEvent.EventType){
                 case EXIT:
                     StopEngine();
                 break;
                 
                 default:
-                    EventController.RunNextEvent();
+                    _eventController.RunNextEvent();
 
                     return;
             }
 
-            EventController.ReturnToMenu();
+            _eventController.ReturnToMenu();
         }
 
         public void EngineLoop(){
-            while(EngineRunning){
+            while(_engineRunning){
                 try{
                     EventIntegration();
                 } catch(InvalidInput e){
                     Console.WriteLine("Error: Invalid game input provided. Additional details: ");
                     Console.WriteLine(e.Message);
+
+                    _eventController.ReturnToMenu();
                 } catch (ResourceNotFound e){
                     Console.WriteLine("Error: Expected game resource not found. Additional details: ");
                     Console.WriteLine(e.Message);
+
+                    break;
                 }
             }
 

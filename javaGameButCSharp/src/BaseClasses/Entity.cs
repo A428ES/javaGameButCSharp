@@ -5,13 +5,13 @@ using System.Text.Json.Serialization;
 namespace JavaGameButCSharp{
     class Entity : StatefulObject{
         [JsonPropertyName("name")]
-        public string Name { get; set; } = String.Empty;
+        public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("health")]
         public int Health { get; set; }
 
         [JsonPropertyName("location")]
-        public string Location { get; set; } = String.Empty;
+        public string Location { get; set; } = string.Empty;
 
         [JsonPropertyName(name: "strength")]
         public int Strength { get; set; }

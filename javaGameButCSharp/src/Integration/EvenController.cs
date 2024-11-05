@@ -6,16 +6,15 @@ namespace JavaGameButCSharp{
         public EventModel LastEvent {get;set;}
         private readonly EventSupporter _eventSupporter;
         private readonly InputOutManager _IO;
-        public Entity ActivePlayer;
-        public Location ActiveLocation;
+        private readonly GameStateController _gameState;
     
-        public EventController(StateManagement stateManagement, SaveLoadManagement saveLoad, EventModel currentEvent){
-            this.CurrentEvent = currentEvent;
-            this.LastEvent = EventModel.Copy(currentEvent);
-            this.ActiveLocation = new Location();
-            this.ActivePlayer = new Entity();
-            this._IO = new InputOutManager();
-            this._eventSupporter = new EventSupporter(stateManagement, saveLoad, _IO);
+        public EventController(StateManagement stateManagement, SaveLoadManagement saveLoad, GameStateController gameState){
+            CurrentEvent = new(MENU_EVENT);
+            LastEvent = EventModel.Copy(CurrentEvent);
+
+            _IO = new InputOutManager();
+            _gameState = gameState;
+            _eventSupporter = new EventSupporter(stateManagement, saveLoad, _IO, _gameState);
         }
 
         public void RunNextEvent(){

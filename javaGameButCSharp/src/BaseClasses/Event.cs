@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json.Serialization;
 using static JavaGameButCSharp.OptionMap;
 
@@ -14,7 +13,7 @@ namespace JavaGameButCSharp{
         [JsonPropertyName("inputOptions")]
         public List<String> InputOptions { get; set; } = [];
 
-        public EventModel Model {get;set;}
+        public EventModel Model {get;set;} = new EventModel(EXIT);
 
         public OptionMap Result {get;}
 
