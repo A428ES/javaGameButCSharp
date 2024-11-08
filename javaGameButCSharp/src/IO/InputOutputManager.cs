@@ -26,6 +26,18 @@ namespace JavaGameButCSharp{
             SegmentDivider();
         }
 
+        public string KeywordReplace(string eventText, Dictionary<String, String> keyMap){
+            foreach(var entry in keyMap){
+                eventText = eventText.Replace(entry.Key, entry.Value);
+            }
+
+            return eventText;
+        }
+
+        public void OutWithKeyWordReplaceAndOptions(string eventText, Dictionary<String, String> keyMap, List<string> options){
+            OutWithOptionsPrompt(KeywordReplace(eventText, keyMap), options);
+        }
+
 
         public void OutWithSubject(string subject, string content){
             Out(subject + ": " + content);
