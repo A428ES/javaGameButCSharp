@@ -15,6 +15,10 @@ namespace JavaGameButCSharp{
         MENU_EVENT,
         LOCATION_EVENT,
         BATTLE_EVENT,
-        ITEM_EVENT
+        ITEM_EVENT,
+        ENTITY_EVENT,
+        EAST,
+        WEST,
+        MENU, 
     }
 }
