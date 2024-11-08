@@ -4,19 +4,15 @@ namespace JavaGameButCSharp{
     class EventSupporter{
         private readonly StateManagement _stateManagement;
         private readonly SaveLoadManagement _saveLoad;
-        private readonly InputOutManager _IO;
-        private readonly GameStateController _gameState;
-        private Event _workingEvent;
+        public SupporterContext _supporterContext;
         public EventModel NextEvent {get;set;}
         public OptionMap EventOutCome {get;set;}
 
 
-        public EventSupporter(StateManagement stateManagement, SaveLoadManagement saveLoad, InputOutManager IO, GameStateController gameState){
+        public EventSupporter(StateManagement stateManagement, SaveLoadManagement saveLoad, SupporterContext supporterContext){
             _stateManagement = stateManagement;
             _saveLoad = saveLoad;
-            _workingEvent = new Event();
-            _IO = IO;
-            _gameState = gameState;
+            _supporterContext = supporterContext;
 
             NextEvent = new EventModel(EVENT);
             EventOutCome = EVENT_IN_PROGRESS;
@@ -28,43 +24,17 @@ namespace JavaGameButCSharp{
             return _stateManagement.Read<Event>(eventPath);
         }
 
-        public void Menu(){
-            MainMenuEventSupporter menuSupport = new(_workingEvent, _IO, _gameState);
-
-            menuSupport.Routing();
-            NextEvent = menuSupport.SystemEvent;
-        }
-
-        public void Battle(){
-
-        }
-
-        public void Location(){
-
-        }
-
         public void RunLastEvent(){
 
         }
 
         public void RunEvent(EventModel nextEvent){
-            _workingEvent = LoadEvent(nextEvent);
+            _supporterContext.WorkingEvent = LoadEvent(nextEvent);
 
-            switch(nextEvent.EventType){
-                case MENU_EVENT:
-                    Menu();
-                    break;
-                case BATTLE_EVENT:
-                    Battle();
-                    break;
-                case LOCATION_EVENT:
-                    Location();
-                    break;
-                default:
-                    RunLastEvent();
-                    break;
+            ISupporter eventSupport = SupporterFactory.GenerateSupporter(nextEvent.EventType, _supporterContext);
 
-            }
+            eventSupport.Routing();
+            NextEvent = _supporterContext.SystemEvent;
         }
     }
 }

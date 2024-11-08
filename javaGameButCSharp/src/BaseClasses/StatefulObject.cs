@@ -1,18 +1,15 @@
-using System;
-using static JavaGameButCSharp.OptionMap;
-
 namespace JavaGameButCSharp{
     class StatefulObject{
-        string FileName {get;}
-        OptionMap Type {get;}
+        private readonly string _fileName;
+        private readonly OptionMap _type;
 
         public StatefulObject(string fileName, OptionMap type){
-            this.FileName = fileName;
-            this.Type = type;
+            _fileName = fileName;
+            _type = type;
         }
 
         public StatefulObject(){
-            this.FileName = string.Empty;
+            _fileName = string.Empty;
         }
 
     }

@@ -1,13 +1,14 @@
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    class BattleSupporter : ISupporter{
+    class LocationSupporter : ISupporter{
         private readonly SupporterContext _supporterContext;
-        public BattleSupporter(SupporterContext supportContext){
+
+        public LocationSupporter(SupporterContext supportContext){
             _supporterContext = supportContext;
         }
         public void Routing(OptionMap overrideInput = EVENT_COMPLETE){
-            
+
         }
     }
 }

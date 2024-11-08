@@ -1,45 +1,35 @@
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    class MainMenuEventSupporter{
-        private readonly InputOutManager _IO;
-        private readonly GameStateController _gameState;
-        private Event _workingEvent;
-        public EventModel SystemEvent {get;set;} = new EventModel(MENU_EVENT);
-
-        public MainMenuEventSupporter(Event workingEvent, InputOutManager io, GameStateController gameState){
-            _IO = io;
-            _workingEvent = workingEvent;
-            _gameState = gameState;
-        }
-
+    class MainMenuEventSupporter(SupporterContext supporterContext) : ISupporter{
+        private readonly SupporterContext _supporterContext = supporterContext;
         public void NewGame(OptionMap enumResult){
-            _IO.OutWithPrompt("CREATING NEW SAVE", "ENTER YOUR NAME");
+            _supporterContext.IO.OutWithPrompt("CREATING NEW SAVE", "ENTER YOUR NAME");
             
             try{
-                _gameState.NewPlayer(_IO.LastUserInput);
+                _supporterContext.GameState.NewPlayer(_supporterContext.IO.LastUserInput);
             } catch (InvalidInput)
             {
-                _IO.OutWithSubject("ERROR", "This save already exists!");
+                _supporterContext.IO.OutWithSubject("ERROR", "This save already exists!");
 
                 Routing(enumResult);
             }
         }
 
         public void Stats(){
-            _IO.OutWithSubject("GAME ENGINE","Loading stats ...");
+            _supporterContext.IO.OutWithSubject("GAME ENGINE","Loading stats ...");
 
-            _gameState.LoadStats();
+            _supporterContext.GameState.LoadStats();
         }
 
         public void LoadGame(){
-            _IO.OutWithPrompt("LOADING EXISTING GAME", "ENTER YOUR SAVE NAME");
-            _gameState.LoadPlayer(_IO.LastUserInput);
+            _supporterContext.IO.OutWithPrompt("LOADING EXISTING GAME", "ENTER YOUR SAVE NAME");
+            _supporterContext.GameState.LoadPlayer(_supporterContext.IO.LastUserInput);
         }
 
         public void ExitGame(){
-            _IO.OutWithSubject("GAME ENGINE", "Attempting shut down ...");
-            SystemEvent = new EventModel(EXIT);
+            _supporterContext.IO.OutWithSubject("GAME ENGINE", "Attempting shut down ...");
+            _supporterContext.SystemEvent = new EventModel(EXIT);
         }
         
         public void Routing(OptionMap overrideInput = EVENT_COMPLETE) {
@@ -47,9 +37,9 @@ namespace JavaGameButCSharp{
             OptionMap enumResult = overrideInput;
 
             if(overrideInput == EVENT_COMPLETE){
-                _IO.OutWithOptionsPrompt(_workingEvent.EventText, _workingEvent.InputOptions);
+                _supporterContext.IO.OutWithOptionsPrompt(_supporterContext.WorkingEvent.EventText, _supporterContext.WorkingEvent.InputOptions);
 
-                if(!Enum.TryParse<OptionMap>(_IO.LastUserInput, true, out enumResult)){
+                if(!Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult)){
                     throw new InvalidInput("Not a valid game engine input");
                 }
             }

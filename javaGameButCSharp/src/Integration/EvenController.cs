@@ -14,7 +14,10 @@ namespace JavaGameButCSharp{
 
             _IO = new InputOutManager();
             _gameState = gameState;
-            _eventSupporter = new EventSupporter(stateManagement, saveLoad, _IO, _gameState);
+
+            SupporterContext supporterContext = new(new Event(), _IO, _gameState);
+
+            _eventSupporter = new EventSupporter(stateManagement, saveLoad, supporterContext);
         }
 
         public void RunNextEvent(){

@@ -3,7 +3,7 @@ using static JavaGameButCSharp.OptionMap;
 namespace JavaGameButCSharp{
     class Engine{
         private readonly EventController _eventController;
-        private GameStateController _gameState;
+        private readonly GameStateController _gameState;
         private bool _engineRunning;
 
         public Engine(string bootPath){
