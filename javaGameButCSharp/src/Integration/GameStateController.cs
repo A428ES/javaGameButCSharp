@@ -5,6 +5,7 @@ namespace JavaGameButCSharp{
         private readonly SaveLoadManagement _saveLoad;
         private readonly StateManagement _stateManagement;
         public Entity ActivePlayer {get;set;}
+        public Entity ActiveTargetNPC {get;set;}
         public Location ActiveLocation {get;set;}
 
         public GameStateController(SaveLoadManagement saveLoad, StateManagement stateManagement){
@@ -13,6 +14,7 @@ namespace JavaGameButCSharp{
 
             ActiveLocation = new Location();
             ActivePlayer = new Entity();
+            ActiveTargetNPC = new Entity();
         }
 
         public void LoadPlayer(string playerName) {       
@@ -20,6 +22,10 @@ namespace JavaGameButCSharp{
 
             ActivePlayer = _stateManagement.Read<Entity>(_saveLoad.GetStatePath(ENTITY, "PLAYER"));
             UpdateLocation(ActivePlayer.Location);
+        }
+
+        public void LoadNPCTarget(string npcName){
+            ActiveTargetNPC = _stateManagement.Read<Entity>(_saveLoad.GetStatePath(ENTITY, npcName));
         }
 
         public void NewPlayer(string newPlayer){
@@ -44,7 +50,8 @@ namespace JavaGameButCSharp{
 
         public void UpdateLocation(string newLocation) {
             string locationPath = _saveLoad.GetStatePath(LOCATION, newLocation);
-            
+
+            ActivePlayer.Location = newLocation;
             ActiveLocation =  _stateManagement.Read<Location>(locationPath);
         }
     }
