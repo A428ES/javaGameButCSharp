@@ -24,10 +24,6 @@ namespace JavaGameButCSharp{
             return _stateManagement.Read<Event>(eventPath);
         }
 
-        public void RunLastEvent(){
-
-        }
-
         public void RunEvent(EventModel nextEvent){
             _supporterContext.WorkingEvent = LoadEvent(nextEvent);
 

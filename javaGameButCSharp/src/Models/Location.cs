@@ -17,7 +17,7 @@ namespace JavaGameButCSharp{
         public string PreviousLocation {get; set;} = string.Empty;
 
         [JsonPropertyName("npcList")]   
-        public List<String> NpcLis {get; set;} = []; 
+        public List<String> NpcList {get; set;} = ["<NO ONE BUT YOU>"]; 
         
         
         public Location(string fileName) : base(fileName, LOCATION){

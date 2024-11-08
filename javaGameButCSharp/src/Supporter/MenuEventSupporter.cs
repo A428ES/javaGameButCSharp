@@ -8,6 +8,7 @@ namespace JavaGameButCSharp{
             
             try{
                 _supporterContext.GameState.NewPlayer(_supporterContext.IO.LastUserInput);
+                LoadPlayerLocation();
             } catch (InvalidInput)
             {
                 _supporterContext.IO.OutWithSubject("ERROR", "This save already exists!");
@@ -22,9 +23,14 @@ namespace JavaGameButCSharp{
             _supporterContext.GameState.LoadStats();
         }
 
+        public void LoadPlayerLocation(){
+            _supporterContext.SystemEvent = new EventModel(LOCATION_EVENT, _supporterContext.GameState.ActivePlayer.Location);
+        }
+
         public void LoadGame(){
             _supporterContext.IO.OutWithPrompt("LOADING EXISTING GAME", "ENTER YOUR SAVE NAME");
             _supporterContext.GameState.LoadPlayer(_supporterContext.IO.LastUserInput);
+            LoadPlayerLocation();
         }
 
         public void ExitGame(){
