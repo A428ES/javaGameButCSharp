@@ -8,25 +8,39 @@ namespace JavaGameButCSharp{
         }
 
         public Dictionary<String, String> StageKeywordReplace(){
-            var activeNPC = _supporterContext.GameState.ActiveTargetNPC;
-
             return new Dictionary<string, string>
                     {
-                        {"{target}", activeNPC.Name},
+                        {"{target}", _supporterContext.GameState.ActiveTargetNPC.Name},
                     };
         }
 
-        public void Routing(OptionMap overrideInput = EVENT_COMPLETE){
-            OptionMap enumResult = overrideInput;
+        public void Escape(){
+            _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActiveLocation.Name);
+        }
+
+        public void Routing(){
+            OptionMap enumResult;
 
             _supporterContext.GameState.LoadNPCTarget(_supporterContext.IO.LastUserInput);
+            _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),_supporterContext.WorkingEvent.InputOptions);
+            Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult);
 
-            if(overrideInput == EVENT_COMPLETE){
-                _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),_supporterContext.WorkingEvent.InputOptions);
-
-                if(!Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult)){
-                    throw new InvalidInput("Not a valid game engine input");
-                }
+            switch(enumResult){
+                case ATTACK:
+                    Escape();
+                break;
+                case ESCAPE:
+                    Escape();
+                break;
+                case ITEM:
+                    Escape();
+                break;
+                case MEDICINE:
+                    Escape();
+                break;
+                default:
+                    Console.WriteLine("test");
+                break;
             }
         }
     }
