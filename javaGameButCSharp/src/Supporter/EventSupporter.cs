@@ -27,9 +27,9 @@ namespace JavaGameButCSharp{
         public void RunEvent(EventModel nextEvent){
             _supporterContext.WorkingEvent = LoadEvent(nextEvent);
 
-            ISupporter eventSupport = SupporterFactory.GenerateSupporter(nextEvent.EventType, _supporterContext);
+            Supporter eventSupport = SupporterFactory.GenerateSupporter(nextEvent.EventType, _supporterContext);
             
-            eventSupport.Routing();
+            eventSupport.Routing(eventSupport.MapRoute());
             NextEvent = _supporterContext.SystemEvent;
         }
     }
