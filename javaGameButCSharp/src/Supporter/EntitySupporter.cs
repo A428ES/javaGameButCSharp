@@ -1,47 +1,36 @@
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    class BattleSupporter : ISupporter{
-        private readonly SupporterContext _supporterContext;
-        public BattleSupporter(SupporterContext supportContext){
-            _supporterContext = supportContext;
-        }
+    class EntitySupporter(SupporterContext supporterContext) : Supporter(supporterContext){
 
-        public Dictionary<String, String> StageKeywordReplace(){
+        public override Dictionary<String, String> StageKeywordReplace(){
             return new Dictionary<string, string>
                     {
                         {"{target}", _supporterContext.GameState.ActiveTargetNPC.Name},
                     };
         }
 
+        public void Attack(){
+            BattleSupporter battleEvent = new(_supporterContext);
+        }
+
+        public void Inventory(){
+            InventorySupporter itemEvent = new(_supporterContext);
+        }
+
         public void Escape(){
             _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActiveLocation.Name);
         }
 
-        public void Routing(){
-            OptionMap enumResult;
-
+        public override Dictionary<OptionMap, Action> MapRoute() {
             _supporterContext.GameState.LoadNPCTarget(_supporterContext.IO.LastUserInput);
-            _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),_supporterContext.WorkingEvent.InputOptions);
-            Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult);
-
-            switch(enumResult){
-                case ATTACK:
-                    Escape();
-                break;
-                case ESCAPE:
-                    Escape();
-                break;
-                case ITEM:
-                    Escape();
-                break;
-                case MEDICINE:
-                    Escape();
-                break;
-                default:
-                    Console.WriteLine("test");
-                break;
-            }
+            
+            return new Dictionary<OptionMap, Action>
+                {
+                    {ATTACK, ()=>Attack()},
+                    {INVENTORY, ()=>Inventory()},
+                    {ESCAPE, () => Escape()},
+                };
         }
     }
 }
