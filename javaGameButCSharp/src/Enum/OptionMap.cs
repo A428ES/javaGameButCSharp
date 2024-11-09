@@ -20,5 +20,11 @@ namespace JavaGameButCSharp{
         EAST,
         WEST,
         MENU, 
+        ATTACK,
+        ESCAPE,
+        MEDICINE,
+        ITEM, 
+        RESUME,
+        DELETE
     }
 }
