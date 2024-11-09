@@ -54,5 +54,22 @@ namespace JavaGameButCSharp{
             ActivePlayer.Location = newLocation;
             ActiveLocation =  _stateManagement.Read<Location>(locationPath);
         }
+
+        public void ResetUser(){
+            ActivePlayer = new Entity();
+            ActiveLocation = new Location();
+        }
+
+        public void DeleteSave(string saveToDelete){
+            _saveLoad.DeleteSave(saveToDelete);
+
+            if(saveToDelete.Equals(ActivePlayer.Name)){
+                ResetUser();
+            }
+        }
+
+        public List<string?> GetGameSaves(){
+            return _saveLoad.GetSaveGameList();
+        }
     }
 }
