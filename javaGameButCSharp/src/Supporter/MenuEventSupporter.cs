@@ -1,10 +1,8 @@
-using System.Runtime.CompilerServices;
-using Microsoft.VisualBasic.FileIO;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    class MainMenuEventSupporter(SupporterContext supporterContext) : ISupporter{
-        private readonly SupporterContext _supporterContext = supporterContext;
+    class MainMenuEventSupporter(SupporterContext supporterContext) : Supporter(supporterContext){
+
         public void NewGame(){
             _supporterContext.IO.OutWithPrompt("CREATING NEW SAVE", "ENTER YOUR NAME");
             
@@ -55,7 +53,7 @@ namespace JavaGameButCSharp{
             }
         }
 
-        public List<string> GetAllUserOptions(){
+        public override List<string> FinalOptionsProcessing(){
             var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
 
             if (!string.IsNullOrEmpty(_supporterContext.GameState.ActivePlayer.Name) && !options.Contains("RESUME")){
@@ -65,41 +63,16 @@ namespace JavaGameButCSharp{
             return options;
         }
 
-        public void RetryWorker(Action action){
-            _supporterContext.RetryHelper.ExecuteWithRetry(action, 5);
-        }
-
-        public void Routing() {
-            OptionMap enumResult;
-            
-            _supporterContext.IO.OutWithOptionsPrompt(_supporterContext.WorkingEvent.EventText, GetAllUserOptions());
-            Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult);
-
-            switch(enumResult){
-                case EXIT:
-                    ExitGame();
-                    break;
-                case NEW:
-                    _supporterContext.RetryHelper.ExecuteWithRetry(()=> NewGame(), 5);
-                    break;
-                case LOAD:
-                    _supporterContext.RetryHelper.ExecuteWithRetry(()=> LoadGame(), 5);
-                    break;
-                case STATS:
-                    Stats();
-                    break;
-                case RESUME:
-                    Resume();
-                    break;
-                case DELETE:
-                    _supporterContext.RetryHelper.ExecuteWithRetry(()=> Delete(), 5);
-                    break;
-                default:
-                    _supporterContext.IO.OutWithSubject("ERROR", "Invalid entry");
-
-                    Routing();
-                    break;
-            }
+        public override Dictionary<OptionMap, Action> MapRoute() {
+            return new Dictionary<OptionMap, Action>
+                {
+                    {EXIT, ()=>ExitGame()},
+                    {LOAD, ()=>RetryWorker(()=> LoadGame())},
+                    {NEW, () => RetryWorker(()=> NewGame())},
+                    {STATS, ()=>Stats()},
+                    {RESUME, ()=>Resume()},
+                    {DELETE, ()=>RetryWorker(()=> Delete())}
+                };
         }
     }
 }
