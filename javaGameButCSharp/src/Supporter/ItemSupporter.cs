@@ -6,7 +6,7 @@ namespace JavaGameButCSharp{
         public ItemSupporter(SupporterContext supportContext){
             _supportContext = supportContext;
         }
-        public void Routing(OptionMap overrideInput = EVENT_COMPLETE){
+        public void Routing(){
 
         }
     }
