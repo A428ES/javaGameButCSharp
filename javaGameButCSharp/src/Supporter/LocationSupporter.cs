@@ -1,14 +1,10 @@
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    class LocationSupporter : ISupporter{
-        private readonly SupporterContext _supporterContext;
+    class LocationSupporter(SupporterContext supporterContext) : Supporter(supporterContext) {
         private const string _LocationText = "HEADS UP";
-        public LocationSupporter(SupporterContext supportContext){
-            _supporterContext = supportContext;
-        }
 
-        public Dictionary<String, String> StageKeywordReplace(){
+        public override Dictionary<String, String> StageKeywordReplace(){
             var activeLocation = _supporterContext.GameState.ActiveLocation;
 
             return new Dictionary<string, string>
@@ -49,7 +45,7 @@ namespace JavaGameButCSharp{
             return false;
         }
 
-        public List<string> GetAllUserOptions(){
+        public override List<string> FinalOptionsProcessing(){
             var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
 
             options.AddRange(_supporterContext.GameState.ActiveLocation.NpcList);
@@ -57,34 +53,14 @@ namespace JavaGameButCSharp{
             return options;
         }
 
-        public void Routing(){
-            OptionMap enumResult;
-
-            _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),GetAllUserOptions());
-            Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult);
-
-            if(CheckNPCInteractAttempt()){
-                return;
-            }
-
-            switch(enumResult){
-                case EAST:
-                    DirectionalMoveAttempt(_supporterContext.GameState.ActiveLocation.PreviousLocation);
-                    break;
-                case WEST:
-                    DirectionalMoveAttempt(_supporterContext.GameState.ActiveLocation.NextLocation);
-                    break;
-                case MENU:
-                    _supporterContext.ResetToMenu();
-                    break;
-                default:
-                    _supporterContext.IO.OutWithSubject("ERROR", "Invalid entry");
-                    
-                    Routing();
-                    break;
-
-            }
-
+        public override Dictionary<OptionMap, Action> MapRoute() {
+            return new Dictionary<OptionMap, Action>
+                {
+                    {EAST, ()=>DirectionalMoveAttempt(_supporterContext.GameState.ActiveLocation.PreviousLocation)},
+                    {WEST, ()=>DirectionalMoveAttempt(_supporterContext.GameState.ActiveLocation.NextLocation)},
+                    {MENU, () => _supporterContext.ResetToMenu()},
+                    {ALTERNATIVE, () => CheckNPCInteractAttempt()}
+                };
         }
     }
 }
