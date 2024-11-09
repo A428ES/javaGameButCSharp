@@ -47,8 +47,14 @@ namespace JavaGameButCSharp{
         }
 
         public void DeleteSave(string saveName){
-            FileManagement.DeleteDirectory(saveName);
+            Directory.Delete($@"{GamePath}\GameSaves\{saveName}", recursive: true);
             LoadUser(String.Empty);
+        }
+
+        public List<string?> GetSaveGameList(){
+            return Directory.GetDirectories($@"{GamePath}\GameSaves")
+                                .Select(Path.GetFileName).ToList();
+
         }
     }
 }
