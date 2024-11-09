@@ -20,7 +20,7 @@ namespace JavaGameButCSharp{
         }
 
         public void DirectionalMoveAttempt(string newLocation){
-            RetryHelper.ExecuteWithRetry(
+            _supporterContext.RetryHelper.ExecuteWithRetry(
                         () => DirectionalMove(newLocation), 
                         2,
                         () => DirectionalMove(_supporterContext.GameState.ActiveLocation.Name, true)
@@ -49,21 +49,22 @@ namespace JavaGameButCSharp{
             return false;
         }
 
-        public void Routing(OptionMap overrideInput = EVENT_COMPLETE){
-            OptionMap enumResult = overrideInput;
-        
-            _supporterContext.WorkingEvent.InputOptions.AddRange(_supporterContext.GameState.ActiveLocation.NpcList);
+        public List<string> GetAllUserOptions(){
+            var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
 
-            if(overrideInput == EVENT_COMPLETE){
-                _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),_supporterContext.WorkingEvent.InputOptions);
+            options.AddRange(_supporterContext.GameState.ActiveLocation.NpcList);
 
-                if(CheckNPCInteractAttempt()){
-                    return;
-                }
+            return options;
+        }
 
-                if(!Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult)){
-                    throw new InvalidInput("Not a valid game engine input");
-                }
+        public void Routing(){
+            OptionMap enumResult;
+
+            _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),GetAllUserOptions());
+            Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out enumResult);
+
+            if(CheckNPCInteractAttempt()){
+                return;
             }
 
             switch(enumResult){
@@ -77,7 +78,9 @@ namespace JavaGameButCSharp{
                     _supporterContext.ResetToMenu();
                     break;
                 default:
-                    BadInput();
+                    _supporterContext.IO.OutWithSubject("ERROR", "Invalid entry");
+                    
+                    Routing();
                     break;
 
             }
