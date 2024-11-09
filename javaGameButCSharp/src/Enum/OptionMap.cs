@@ -25,6 +25,8 @@ namespace JavaGameButCSharp{
         MEDICINE,
         ITEM, 
         RESUME,
-        DELETE
+        DELETE,
+        INVENTORY, 
+        ALTERNATIVE,
     }
 }
