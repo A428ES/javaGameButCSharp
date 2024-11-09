@@ -1,27 +1,35 @@
 namespace JavaGameButCSharp{
-class RetryHelper
-{
-    public static void ExecuteWithRetry(Action action, int maxRetries, Action onRetry)
+    class RetryHelper
     {
-        int attempt = 0;
-        string errorString = string.Empty;
-
-        while (attempt < maxRetries)
-        {
-            try
-            {
-                action();
-                return;
-            }
-            catch (ResourceNotFound ex)
-            {
-                errorString = ex.Message;
-                action = onRetry;
-                attempt++;
-            }
+        
+        private InputOutManager _IO;
+        public RetryHelper(InputOutManager IO){
+            _IO = IO;
         }
 
-        throw new ResourceNotFound($"Failed recovering from ResourceNotFound error citing: {errorString}");
+        public void ExecuteWithRetry(Action action, int maxRetries, Action? onRetry=null)
+        {
+            int attempt = 0;
+            string errorString = string.Empty;
+
+            while (attempt < maxRetries) {
+                try {
+                    action();
+                    return;
+                } catch (ResourceNotFound) {
+                    errorString = "Could not find requested resource";
+                } catch (InvalidInput){
+                    errorString = "Repeated invalid entry";
+                } finally{
+                    attempt++;
+                    
+                    if(onRetry != null){
+                        action = onRetry;
+                    }
+                }
+            }
+
+            throw new ResourceNotFound($"Failed recovering from ResourceNotFound error citing: {errorString}");
+        }
     }
-}
 }
