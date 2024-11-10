@@ -5,6 +5,9 @@ namespace JavaGameButCSharp{
     class Item{
         [JsonPropertyName("name")]
         public string Name {get;set;}
+        
+        [JsonPropertyName("description")]
+        public string Description {get;set;}
 
         [JsonPropertyName("modifier")]
         public int Modifier {get; set;}
