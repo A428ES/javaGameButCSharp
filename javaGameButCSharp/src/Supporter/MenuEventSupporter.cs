@@ -54,13 +54,7 @@ namespace JavaGameButCSharp{
         }
 
         public override List<string> FinalOptionsProcessing(){
-            var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
-
-            if (!string.IsNullOrEmpty(_supporterContext.GameState.ActivePlayer.Name) && !options.Contains("RESUME")){
-                options.Add("RESUME");
-            }
-
-            return options;
+            return LoggedInResume();
         }
 
         public override Dictionary<OptionMap, Action> MapRoute() {
