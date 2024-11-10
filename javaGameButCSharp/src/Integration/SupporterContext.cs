@@ -22,7 +22,19 @@ namespace JavaGameButCSharp{
         }
 
         public void ResumeGame(){
-            SystemEvent = new(OptionMap.LOCATION_EVENT, GameState.ActiveLocation.Name);
+            if(GameState.InBattle){
+                SystemEvent = new (OptionMap.BATTLE_EVENT, GameState.ActiveTargetNPC.Name);
+            } else {
+                SystemEvent = new(OptionMap.LOCATION_EVENT, GameState.ActiveLocation.Name);
+            }
+        }
+
+        public void ToggleBattleOn(){
+            GameState.InBattle = true;
+        }
+
+        public void ToggleBattleOff(){
+            GameState.InBattle = false;
         }
     }
 }
