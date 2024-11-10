@@ -83,6 +83,7 @@ namespace JavaGameButCSharp{
         public void ResetUser(){
             ActivePlayer = new Entity();
             ActiveLocation = new Location();
+            ActiveItem = new Item();
         }
 
         public void DeleteSave(string saveToDelete){
