@@ -7,6 +7,8 @@ namespace JavaGameButCSharp{
         public Entity ActivePlayer {get;set;}
         public Entity ActiveTargetNPC {get;set;}
         public Location ActiveLocation {get;set;}
+        public Item ActiveItem {get;set;}
+        public bool InBattle{get;set;} = false;
 
         public GameStateController(SaveLoadManagement saveLoad, StateManagement stateManagement){
             _saveLoad = saveLoad;
@@ -15,6 +17,7 @@ namespace JavaGameButCSharp{
             ActiveLocation = new Location();
             ActivePlayer = new Entity();
             ActiveTargetNPC = new Entity();
+            ActiveItem = new Item();
         }
 
         public void LoadPlayer(string playerName) {       
@@ -26,6 +29,10 @@ namespace JavaGameButCSharp{
 
         public void LoadNPCTarget(string npcName){
             ActiveTargetNPC = _stateManagement.Read<Entity>(_saveLoad.GetStatePath(ENTITY, npcName));
+        }
+
+        public void LoadItem(Item item){
+            ActiveItem = item;
         }
 
         public void SavePlayer(){
