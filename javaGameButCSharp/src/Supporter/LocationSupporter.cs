@@ -37,7 +37,7 @@ namespace JavaGameButCSharp{
         }
 
         public bool CheckNPCInteractAttempt(){
-            if(_supporterContext.GameState.ActiveLocation.NpcList.Contains(_supporterContext.IO.LastUserInput)){
+            if(_supporterContext.GameState.ActiveLocation.NpcList.Contains(_supporterContext.IO.LastUserInput.ToUpper())){
                 _supporterContext.SystemEvent = new(ENTITY_EVENT, _supporterContext.IO.LastUserInput);
                 return true;
             }
