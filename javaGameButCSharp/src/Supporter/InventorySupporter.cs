@@ -13,12 +13,16 @@ namespace JavaGameButCSharp{
 
             _supporterContext.IO.OutWithOptionsPrompt("SELECT AN ITEM",medicineList);
 
-            if(medicineList.Contains(_supporterContext.IO.LastUserInput)){
+            if(medicineList.Contains(_supporterContext.IO.LastUserInput.ToUpper())){
                 _supporterContext.SystemEvent = new(ITEM_EVENT);
             }
         }
         public void Resume(){
             _supporterContext.ResumeGame();
+        }
+
+        public override List<string> FinalOptionsProcessing(){
+            return LoggedInResume();
         }
 
         public override Dictionary<OptionMap, Action> MapRoute(){
