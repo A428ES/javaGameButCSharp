@@ -30,5 +30,10 @@ namespace JavaGameButCSharp{
         ALTERNATIVE,
         LEAVE,
         BATTLE,
+        ARMORS, 
+        WEAPONS,
+        INVENTORY_EVENT, 
+        ACTIVATE,
+        DROP
     }
 }
