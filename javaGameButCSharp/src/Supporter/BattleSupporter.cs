@@ -38,6 +38,7 @@ namespace JavaGameButCSharp{
 
         public void EndBattleEvent(string message){
             _supporterContext.IO.OutWithSubject("ITS OVER", message);
+            _supporterContext.ToggleBattleOff();
             _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActivePlayer.Location);
         }
 
@@ -79,13 +80,17 @@ namespace JavaGameButCSharp{
         }
 
         public void Escape(){
-            _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActiveLocation.Name);
+            EndBattleEvent("You escaped successfully");
         }
 
+        public void Inventory(){
+            _supporterContext.SystemEvent = new(INVENTORY_EVENT, "");
+        } 
         public override Dictionary<OptionMap, Action> MapRoute(){
             return new Dictionary<OptionMap, Action>
                 {
                     {ATTACK, () => Attack()},
+                    {INVENTORY, () => Inventory()},
                     {ESCAPE, () => Escape()}
                 };
         }
