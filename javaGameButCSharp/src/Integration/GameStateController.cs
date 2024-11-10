@@ -28,6 +28,24 @@ namespace JavaGameButCSharp{
             ActiveTargetNPC = _stateManagement.Read<Entity>(_saveLoad.GetStatePath(ENTITY, npcName));
         }
 
+        public void SavePlayer(){
+            _stateManagement.Write(ActiveLocation.FilePath, ActivePlayer);
+        }
+
+        public void SaveNPCTarget(){
+            _stateManagement.Write(ActiveTargetNPC.FilePath, ActiveTargetNPC);
+        }
+
+        public void SaveLocation(){
+            _stateManagement.Write(ActiveLocation.FilePath, ActiveLocation);
+        }
+
+        public void SaveAllStates(){
+            SavePlayer();
+            SaveNPCTarget();
+            SaveLocation();
+        }
+
         public void NewPlayer(string newPlayer){
             _saveLoad.NewSave(newPlayer);
 
