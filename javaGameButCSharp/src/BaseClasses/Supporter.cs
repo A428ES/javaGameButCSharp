@@ -20,6 +20,16 @@ namespace JavaGameButCSharp{
             return _supporterContext.WorkingEvent.InputOptions;
         }
 
+        public List<string> LoggedInResume(){
+            var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
+
+            if (!string.IsNullOrEmpty(_supporterContext.GameState.ActivePlayer.Name) && !options.Contains("RESUME")){
+                options.Add("RESUME");
+            }
+
+            return options;
+        }
+
         public void Routing(Dictionary<OptionMap, Action> supporterMap){
             _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),FinalOptionsProcessing());
 
