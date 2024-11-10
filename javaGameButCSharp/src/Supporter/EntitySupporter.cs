@@ -18,6 +18,8 @@ namespace JavaGameButCSharp{
 
                 return;
             }
+            
+            _supporterContext.ToggleBattleOn();
             _supporterContext.SystemEvent = new(BATTLE_EVENT, _supporterContext.GameState.ActiveTargetNPC.Name);
         }
 
