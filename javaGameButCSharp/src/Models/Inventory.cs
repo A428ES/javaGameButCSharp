@@ -26,7 +26,8 @@ namespace JavaGameButCSharp{
             return GetItem(ActiveWeapon);
         }
 
+        public List<Item> GetItemType(string type){
+            return EntityInventory.Where(item => item.Type.Equals(type.ToUpper())).ToList();
+        }
     }
-
-
 }
