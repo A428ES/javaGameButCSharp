@@ -1,15 +1,21 @@
 namespace JavaGameButCSharp{
     class StatefulObject{
-        private readonly string _fileName;
+        public string FilePath {get; private set;} = string.Empty;
         private readonly OptionMap _type;
 
-        public StatefulObject(string fileName, OptionMap type){
-            _fileName = fileName;
+        public StatefulObject(string filePath, OptionMap type){
+            FilePath = filePath;
             _type = type;
         }
 
         public StatefulObject(){
-            _fileName = string.Empty;
+            FilePath = string.Empty;
+        }
+
+        public void SetFilePath(string filePath){
+            if(FilePath.Equals(string.Empty)){
+                FilePath = filePath;
+            }
         }
 
     }
