@@ -10,15 +10,18 @@ namespace JavaGameButCSharp{
                     };
         }
 
-        public void Attack(){
-            BattleSupporter battleEvent = new(_supporterContext);
+        public void Battle(){
+            if(_supporterContext.GameState.ActivePlayer.Health <= 0){
+                _supporterContext.IO.OutWithSubject("HEADS UP", "You can't battle with no health!");
+                
+                Leave();
+
+                return;
+            }
+            _supporterContext.SystemEvent = new(BATTLE_EVENT, _supporterContext.GameState.ActiveTargetNPC.Name);
         }
 
-        public void Inventory(){
-            InventorySupporter itemEvent = new(_supporterContext);
-        }
-
-        public void Escape(){
+        public void Leave(){
             _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActiveLocation.Name);
         }
 
@@ -27,9 +30,8 @@ namespace JavaGameButCSharp{
             
             return new Dictionary<OptionMap, Action>
                 {
-                    {ATTACK, ()=>Attack()},
-                    {INVENTORY, ()=>Inventory()},
-                    {ESCAPE, () => Escape()},
+                    {BATTLE, () => Battle()},
+                    {LEAVE, () => Leave()},
                 };
         }
     }
