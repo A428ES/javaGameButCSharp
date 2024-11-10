@@ -28,5 +28,7 @@ namespace JavaGameButCSharp{
         DELETE,
         INVENTORY, 
         ALTERNATIVE,
+        LEAVE,
+        BATTLE,
     }
 }
