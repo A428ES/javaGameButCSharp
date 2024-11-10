@@ -17,8 +17,12 @@ namespace JavaGameButCSharp{
 
 
             string jsonData = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<T>(jsonData) 
-                ?? throw new JsonException($"Failed to deserialize {typeof(T).Name}");
+
+            var statefulObject = JsonSerializer.Deserialize<T>(jsonData) ?? throw new JsonException($"Failed to deserialize {typeof(T).Name}");
+
+            statefulObject.SetFilePath(filePath);
+
+            return statefulObject;
         }
         public void Write<T>(string filePath, T statefulObject) where T : StatefulObject{
             string jsonString = JsonSerializer.Serialize(statefulObject);

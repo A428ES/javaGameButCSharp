@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace JavaGameButCSharp{
     class Item{
+        [JsonPropertyName("name")]
+        public string Name {get;set;}
+
         [JsonPropertyName("modifier")]
         public int Modifier {get; set;}
 
