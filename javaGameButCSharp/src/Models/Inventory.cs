@@ -1,4 +1,3 @@
-using System;
 using System.Text.Json.Serialization;
 
 namespace JavaGameButCSharp{
@@ -14,6 +13,19 @@ namespace JavaGameButCSharp{
 
         public Inventory(){
         }
+
+        public Item GetItem(string itemID){
+            return EntityInventory.FirstOrDefault(item => item.Name.Equals(itemID.ToUpper())) ?? throw new ResourceNotFound("Cannot locate item");
+        }
+
+        public Item GetActiveArmor(){
+            return GetItem(ActiveArmor);
+        }
+
+        public Item GetActiveWeapon(){
+            return GetItem(ActiveWeapon);
+        }
+
     }
 
 
