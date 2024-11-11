@@ -27,6 +27,11 @@ namespace JavaGameButCSharp{
             _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActiveLocation.Name);
         }
 
+        public override List<string> FinalOptionsProcessing()
+        {
+            return GlobalMenuOptions(["RESUME"]);
+        }
+
         public override Dictionary<OptionMap, Action> MapRoute() {
             _supporterContext.GameState.LoadNPCTarget(_supporterContext.IO.LastUserInput);
             
