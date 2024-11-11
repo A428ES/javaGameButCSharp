@@ -8,21 +8,17 @@ namespace JavaGameButCSharp{
         }
 
         public void ListItems(string type){
-            List<string> medicineList = ItemStringList(_supporterContext.GameState.ActivePlayer.Inventory.GetItemType(type));
-            medicineList.Add("EXIT");
+            List<string> itemList = ItemStringList(_supporterContext.GameState.ActivePlayer.Inventory.GetItemType(type));
+            itemList.AddRange(GlobalMenuOptions(["MEDICINE", "WEAPONS", "ARMOR", "STATS"]));
 
-            _supporterContext.IO.OutWithOptionsPrompt("SELECT AN ITEM",medicineList);
+            _supporterContext.IO.OutWithOptionsPrompt("SELECT AN ITEM",itemList);
 
-            if(medicineList.Contains(_supporterContext.IO.LastUserInput.ToUpper())){
+            if(itemList.Contains(_supporterContext.IO.LastUserInput.ToUpper())){
                 _supporterContext.SystemEvent = new(ITEM_EVENT);
             }
         }
-        public void Resume(){
-            _supporterContext.ResumeGame();
-        }
-
         public override List<string> FinalOptionsProcessing(){
-            return LoggedInResume();
+            return GlobalMenuOptions(["INVENTORY"]);
         }
 
         public override Dictionary<OptionMap, Action> MapRoute(){
@@ -31,7 +27,6 @@ namespace JavaGameButCSharp{
                     {MEDICINE, () => ListItems("MEDICINE")},
                     {ARMORS, () => ListItems("ARMOR")},
                     {WEAPONS, () => ListItems("WEAPON")},
-                    {RESUME, () => Resume()}
                 };
         }
 
