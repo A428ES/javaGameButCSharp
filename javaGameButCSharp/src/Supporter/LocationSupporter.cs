@@ -46,7 +46,7 @@ namespace JavaGameButCSharp{
         }
 
         public override List<string> FinalOptionsProcessing(){
-            var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
+            var options = GlobalMenuOptions(["RESUME"]);
 
             options.AddRange(_supporterContext.GameState.ActiveLocation.NpcList);
 
@@ -58,7 +58,6 @@ namespace JavaGameButCSharp{
                 {
                     {EAST, ()=>DirectionalMoveAttempt(_supporterContext.GameState.ActiveLocation.PreviousLocation)},
                     {WEST, ()=>DirectionalMoveAttempt(_supporterContext.GameState.ActiveLocation.NextLocation)},
-                    {MENU, () => _supporterContext.ResetToMenu()},
                     {ALTERNATIVE, () => CheckNPCInteractAttempt()}
                 };
         }
