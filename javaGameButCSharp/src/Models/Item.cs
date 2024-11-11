@@ -20,6 +20,8 @@ namespace JavaGameButCSharp{
 
         [JsonPropertyName("type")]
         public string Type {get; set;}
+        [JsonPropertyName("quantity")]
+        public int Quantity {get; set;}
 
         public Item(){
             this.Type = String.Empty;
