@@ -36,5 +36,13 @@ namespace JavaGameButCSharp{
         public void ToggleBattleOff(){
             GameState.InBattle = false;
         }
+
+        public void Inventory(){
+            SystemEvent = new(OptionMap.INVENTORY_EVENT, "");
+        } 
+
+        public bool LoggedIn(){
+            return !string.IsNullOrEmpty(GameState.ActivePlayer.Name);
+        }
     }
 }
