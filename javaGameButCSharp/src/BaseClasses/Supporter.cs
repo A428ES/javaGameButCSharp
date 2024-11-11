@@ -20,18 +20,38 @@ namespace JavaGameButCSharp{
             return _supporterContext.WorkingEvent.InputOptions;
         }
 
-        public List<string> LoggedInResume(){
+        public List<string> GlobalMenuOptions(List<string>? exclude = null){
             var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
 
-            if (!string.IsNullOrEmpty(_supporterContext.GameState.ActivePlayer.Name) && !options.Contains("RESUME")){
-                options.Add("RESUME");
+            if(exclude == null)
+            {
+                exclude = [];
             }
 
-            return options;
+            if (!string.IsNullOrEmpty(_supporterContext.GameState.ActivePlayer.Name)){
+                options.Add("RESUME");
+                options.Add("INVENTORY");
+                options.Add("STATS");
+            }
+
+            options.Add("MENU");
+
+            return options.Where(option => !exclude.Contains(option)).ToList();
+        }
+
+        public Dictionary<OptionMap, Action> GlobalRoutes(Dictionary<OptionMap, Action> routes){
+            routes.Add(OptionMap.RESUME, () => _supporterContext.ResumeGame());
+            routes.Add(OptionMap.STATS, () => _supporterContext.GameState.LoadStats());
+            routes.Add(OptionMap.MENU, () => _supporterContext.ResetToMenu());
+            routes.Add(OptionMap.INVENTORY, () => _supporterContext.Inventory());
+
+            return routes;
         }
 
         public void Routing(Dictionary<OptionMap, Action> supporterMap){
             _supporterContext.IO.OutWithKeyWordReplaceAndOptions(_supporterContext.WorkingEvent.EventText, StageKeywordReplace(),FinalOptionsProcessing());
+
+            supporterMap = GlobalRoutes(supporterMap);
 
             Enum.TryParse<OptionMap>(_supporterContext.IO.LastUserInput, true, out OptionMap enumResult);
 
@@ -41,7 +61,7 @@ namespace JavaGameButCSharp{
             if(toRun != null){
                 toRun();
             } else {
-                throw new InvalidInput("This shouldn't have happened.");
+                throw new InvalidInput("Returning to main menu! You may resume your game from there.");
             }
         }
     }
