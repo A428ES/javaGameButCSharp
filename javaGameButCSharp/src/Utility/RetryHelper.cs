@@ -16,16 +16,18 @@ namespace JavaGameButCSharp{
                 try {
                     action();
                     return;
-                } catch (ResourceNotFound) {
-                    errorString = "Could not find requested resource";
-                } catch (InvalidInput){
-                    errorString = "Repeated invalid entry";
+                } catch (ResourceNotFound e) {
+                    errorString = $"Unable to locate the requested system resource: {e.Message}";
+                } catch (InvalidInput e){
+                    errorString = $"Invalid Input: {e.Message}";
                 } finally{
                     attempt++;
                     
                     if(onRetry != null){
                         action = onRetry;
                     }
+
+                    _IO.OutWithSubject("ERROR", errorString);
                 }
             }
 
