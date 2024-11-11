@@ -36,7 +36,7 @@ namespace JavaGameButCSharp{
         }
 
         public void SavePlayer(){
-            _stateManagement.Write(ActiveLocation.FilePath, ActivePlayer);
+            _stateManagement.Write(ActivePlayer.FilePath, ActivePlayer);
         }
 
         public void SaveNPCTarget(){
