@@ -1,6 +1,7 @@
 using static JavaGameButCSharp.OptionMap;
 namespace JavaGameButCSharp{
     class BattleSupporter(SupporterContext supporterContext) : Supporter(supporterContext){
+        List<string> BattleMessages = [];
         public override Dictionary<String, String> StageKeywordReplace(){
             return new Dictionary<string, string>
                     {
@@ -13,9 +14,12 @@ namespace JavaGameButCSharp{
             int damageOutcome = GameMath.DamageCalculation(attackOrder[0], attackOrder[1]);
 
             if(damageOutcome < 0){
-                attackOrder[1].Health += damageOutcome;
+
+                attackOrder[0].Health += damageOutcome;
+                BattleMessages.Add($"{attackOrder[0].Name} took {damageOutcome} recoil damage.");
             } else {
-                attackOrder[0].Health -= damageOutcome;
+                attackOrder[1].Health -= damageOutcome;
+                BattleMessages.Add($"{attackOrder[1].Name} took {damageOutcome} battle damage.");
             }
 
             _supporterContext.GameState.SaveAllStates();
@@ -26,35 +30,33 @@ namespace JavaGameButCSharp{
         public void BattleOutput(Entity[] attackOrder, int damage){
             GameStateController gameState = _supporterContext.GameState;
 
-            List<string> messages =
-            [
-                $"{attackOrder[0].Name} INFLICTED {damage} DAMAGE",
-                $"YOUR HEALTH: {gameState.ActivePlayer.Health.ToString()}",
-                $"{gameState.ActiveTargetNPC.Name} HEALTH: {gameState.ActiveTargetNPC.Health.ToString()}",
-            ];
+            CheckBattleOutcome();
+
+            BattleMessages.Add($"YOUR HEALTH: {gameState.ActivePlayer.Health.ToString()}");
+            BattleMessages.Add($"{gameState.ActiveTargetNPC.Name} HEALTH: {gameState.ActiveTargetNPC.Health.ToString()}");
             
-            _supporterContext.IO.OutWithMultipleMessages(messages);
+            _supporterContext.IO.OutWithMultipleMessages(BattleMessages);
+
+            BattleMessages = [];
         }
 
         public void EndBattleEvent(string message){
-            _supporterContext.IO.OutWithSubject("ITS OVER", message);
             _supporterContext.ToggleBattleOff();
             _supporterContext.SystemEvent = new(LOCATION_EVENT, _supporterContext.GameState.ActivePlayer.Location);
+            BattleMessages.Add(message);
         }
 
         public void NPCDefeated(){
             _supporterContext.GameState.ActiveLocation.NpcList.Remove(_supporterContext.GameState.ActiveTargetNPC.Name);
 
-            string message = $"YOU DEFEATED {_supporterContext.GameState.ActiveTargetNPC.Name}";
-            EndBattleEvent(message);
+            EndBattleEvent($"YOU DEFEATED {_supporterContext.GameState.ActiveTargetNPC.Name}");
         }
 
         public void PlayerDefeated(){
             _supporterContext.GameState.ActivePlayer.Health = 0;
             _supporterContext.GameState.ActiveTargetNPC.Health = 100;
 
-            string message = $"YOU WERE DEFEATED BY {_supporterContext.GameState.ActiveTargetNPC.Name}";
-            EndBattleEvent(message);
+            EndBattleEvent($"YOU WERE DEFEATED BY {_supporterContext.GameState.ActiveTargetNPC.Name}");
         }
 
         public void CheckBattleOutcome(){
@@ -72,9 +74,12 @@ namespace JavaGameButCSharp{
     
             BattleOutput(attackOrder, DamageProcessing(attackOrder));
             Array.Reverse(attackOrder);
-            BattleOutput(attackOrder,  DamageProcessing(attackOrder));
 
-            CheckBattleOutcome();
+            if(!_supporterContext.GameState.InBattle){
+                return;
+            }
+
+            BattleOutput(attackOrder,  DamageProcessing(attackOrder));
 
             _supporterContext.GameState.SaveAllStates();
         }
@@ -83,14 +88,15 @@ namespace JavaGameButCSharp{
             EndBattleEvent("You escaped successfully");
         }
 
-        public void Inventory(){
-            _supporterContext.SystemEvent = new(INVENTORY_EVENT, "");
-        } 
+        public override List<string> FinalOptionsProcessing()
+        {
+            return GlobalMenuOptions(["RESUME"]);
+        }
+
         public override Dictionary<OptionMap, Action> MapRoute(){
             return new Dictionary<OptionMap, Action>
                 {
                     {ATTACK, () => Attack()},
-                    {INVENTORY, () => Inventory()},
                     {ESCAPE, () => Escape()}
                 };
         }
