@@ -10,12 +10,6 @@ namespace JavaGameButCSharp{
             LoadPlayerLocation();
         }
 
-        public void Stats(){
-            _supporterContext.IO.OutWithSubject("GAME ENGINE","Loading stats ...");
-
-            _supporterContext.GameState.LoadStats();
-        }
-
         public void LoadPlayerLocation(){
             _supporterContext.SystemEvent = new EventModel(LOCATION_EVENT, _supporterContext.GameState.ActivePlayer.Location);
         }
@@ -54,7 +48,13 @@ namespace JavaGameButCSharp{
         }
 
         public override List<string> FinalOptionsProcessing(){
-            return LoggedInResume();
+            List<string> excludeList = ["MENU"];
+
+            if(_supporterContext.LoggedIn()){
+                excludeList.AddRange(["LOAD", "MENU", "DELETE", "NEW"]);
+            }
+
+            return GlobalMenuOptions(excludeList);
         }
 
         public override Dictionary<OptionMap, Action> MapRoute() {
@@ -63,8 +63,6 @@ namespace JavaGameButCSharp{
                     {EXIT, ()=>ExitGame()},
                     {LOAD, ()=>RetryWorker(()=> LoadGame())},
                     {NEW, () => RetryWorker(()=> NewGame())},
-                    {STATS, ()=>Stats()},
-                    {RESUME, ()=>Resume()},
                     {DELETE, ()=>RetryWorker(()=> Delete())}
                 };
         }
