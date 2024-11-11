@@ -15,7 +15,7 @@ namespace JavaGameButCSharp{
         }
 
         public Item GetItem(string itemID){
-            return EntityInventory.FirstOrDefault(item => item.Name.Equals(itemID.ToUpper())) ?? throw new ResourceNotFound("Cannot locate item");
+            return EntityInventory.FirstOrDefault(item => item.Name.Equals(itemID.ToUpper()) && item.Quantity > 0) ?? throw new ResourceNotFound("Cannot locate item");
         }
 
         public Item GetActiveArmor(){
@@ -27,7 +27,7 @@ namespace JavaGameButCSharp{
         }
 
         public List<Item> GetItemType(string type){
-            return EntityInventory.Where(item => item.Type.Equals(type.ToUpper())).ToList();
+            return EntityInventory.Where(item => item.Type.Equals(type.ToUpper()) && item.Quantity > 0).ToList();
         }
     }
 }
