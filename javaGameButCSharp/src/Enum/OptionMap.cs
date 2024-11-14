@@ -34,6 +34,6 @@ namespace JavaGameButCSharp{
         WEAPONS,
         INVENTORY_EVENT, 
         ACTIVATE,
-        DROP
+        DROP, LOGOUT
     }
 }

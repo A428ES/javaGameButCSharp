@@ -8,7 +8,7 @@ namespace JavaGameButCSharp{
             _supporterContext = supporterContext;
         }
 
-        public void RetryWorker(Action action, int maxRetries=5){
+        public void RetryWorker(Action action, int maxRetries=1){
             _supporterContext.RetryHelper.ExecuteWithRetry(action, maxRetries);
         }
 
@@ -20,21 +20,17 @@ namespace JavaGameButCSharp{
             return _supporterContext.WorkingEvent.InputOptions;
         }
 
-        public List<string> GlobalMenuOptions(List<string>? exclude = null){
-            var options = new List<string>(_supporterContext.WorkingEvent.InputOptions);
-
-            if(exclude == null)
-            {
-                exclude = [];
-            }
+        public List<string> GlobalMenuOptions(List<string> exclude = null){
+            var options = new List<string>();
+            exclude ??= [];
 
             if (!string.IsNullOrEmpty(_supporterContext.GameState.ActivePlayer.Name)){
                 options.Add("RESUME");
                 options.Add("INVENTORY");
                 options.Add("STATS");
-            }
-
+            } 
             options.Add("MENU");
+            options.AddRange(_supporterContext.WorkingEvent.InputOptions);
 
             return options.Where(option => !exclude.Contains(option)).ToList();
         }
@@ -58,11 +54,7 @@ namespace JavaGameButCSharp{
             Action? toRun = supporterMap.GetValueOrDefault(enumResult);
             toRun ??= supporterMap.GetValueOrDefault(OptionMap.ALTERNATIVE);
 
-            if(toRun != null){
-                toRun();
-            } else {
-                throw new InvalidInput("Returning to main menu! You may resume your game from there.");
-            }
+            toRun?.Invoke();
         }
     }
 }

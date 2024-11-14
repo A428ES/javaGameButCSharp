@@ -1,3 +1,4 @@
+using System.Windows;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
@@ -7,6 +8,8 @@ namespace JavaGameButCSharp{
             _supporterContext.IO.OutWithPrompt("CREATING NEW SAVE", "ENTER YOUR NAME");
             
             _supporterContext.GameState.NewPlayer(_supporterContext.IO.LastUserInput);
+
+            _supporterContext.IO.NotifyUser("New user created");
             LoadPlayerLocation();
         }
 
@@ -18,12 +21,14 @@ namespace JavaGameButCSharp{
             _supporterContext.IO.OutWithPrompt("LOADING EXISTING GAME", "ENTER YOUR SAVE NAME");
             _supporterContext.GameState.LoadPlayer(_supporterContext.IO.LastUserInput);
 
+            _supporterContext.IO.NotifyUser($"Hello, {_supporterContext.GameState.ActivePlayer.Name}!");
             LoadPlayerLocation();
         }
 
         public void ExitGame(){
             _supporterContext.IO.OutWithSubject("GAME ENGINE", "Attempting shut down ...");
-            _supporterContext.SystemEvent = new EventModel(EXIT);
+            
+            System.Windows.Application.Current.Shutdown();
         }
         
         public void Resume(){
@@ -49,21 +54,18 @@ namespace JavaGameButCSharp{
 
         public override List<string> FinalOptionsProcessing(){
             List<string> excludeList = ["MENU"];
+            List<string> final = GlobalMenuOptions(excludeList);
 
-            if(_supporterContext.LoggedIn()){
-                excludeList.AddRange(["LOAD", "MENU", "DELETE", "NEW"]);
-            }
-
-            return GlobalMenuOptions(excludeList);
+            return final;
         }
-
+        
         public override Dictionary<OptionMap, Action> MapRoute() {
             return new Dictionary<OptionMap, Action>
                 {
-                    {EXIT, ()=>ExitGame()},
-                    {LOAD, ()=>RetryWorker(()=> LoadGame())},
                     {NEW, () => RetryWorker(()=> NewGame())},
-                    {DELETE, ()=>RetryWorker(()=> Delete())}
+                    {LOAD, () => RetryWorker(()=> LoadGame())},
+                    {LOGOUT, () => _supporterContext.GameState.ResetUser()},
+                    {EXIT, () => ExitGame()},
                 };
         }
     }

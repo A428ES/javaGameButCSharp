@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text.Json.Serialization;
 using static JavaGameButCSharp.OptionMap;
 
@@ -47,11 +48,16 @@ namespace JavaGameButCSharp{
         }
 
         public void DeleteSave(string saveName){
-            Directory.Delete($@"{GamePath}\GameSaves\{saveName}", recursive: true);
-            LoadUser(String.Empty);
+            try{
+                Directory.Delete($@"{GamePath}\GameSaves\{saveName}", recursive: true);
+                
+                LoadUser(String.Empty);
+            } catch (Exception e){
+                throw new ResourceNotFound($"Unable to delete directory: {e.Message}");
+            }
         }
 
-        public List<string?> GetSaveGameList(){
+        public List<String> GetSaveGameList(){
             return Directory.GetDirectories($@"{GamePath}\GameSaves")
                                 .Select(Path.GetFileName).ToList();
 

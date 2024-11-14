@@ -24,13 +24,15 @@ namespace JavaGameButCSharp{
             return _stateManagement.Read<Event>(eventPath);
         }
 
-        public void RunEvent(EventModel nextEvent){
+        public Supporter RunEvent(EventModel nextEvent){
             _supporterContext.WorkingEvent = LoadEvent(nextEvent);
 
             Supporter eventSupport = SupporterFactory.GenerateSupporter(nextEvent.EventType, _supporterContext);
             
             eventSupport.Routing(eventSupport.MapRoute());
             NextEvent = _supporterContext.SystemEvent;
+
+            return eventSupport;
         }
     }
 }
