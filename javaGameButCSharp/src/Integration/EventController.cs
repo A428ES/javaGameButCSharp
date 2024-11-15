@@ -54,7 +54,14 @@ namespace JavaGameButCSharp{
             _displayContext.GameMenu.LoadMenuStack("MENU", supporterObject.MapRoute());
 
             if(!_gameState.ActivePlayer.Name.Equals("") && sprite == null){
-                sprite = new Sprite(@"C:\Arrows.png", new System.Windows.Point(100, 100), _displayContext.GameCanvas);
+                sprite = new Sprite(
+                    @"C:\Walk.png", 
+                    new System.Windows.Point(100, 100), 
+                    _displayContext.GameCanvas, 
+                    frameCount: 6, 
+                    frameWidth: 42, 
+                    frameHeight: 42
+                );
             } else if(_gameState.ActivePlayer.Name.Equals("") && sprite != null){
                 sprite.DestroySprite();
                 sprite = null;
