@@ -23,7 +23,13 @@ namespace JavaGameButCSharp
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Menu row
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Game area row/*
 
-            DisplayContext = new(new EngineMenu(this.Dispatcher), new Canvas());
+            Boundary boundary = new(this.Width, this.Height, 32);
+            boundary.BuildGrid();
+
+            DisplayContext = new(
+                    new EngineMenu(this.Dispatcher), 
+                    new Canvas(),
+                    boundary);
 
             Grid.SetRow(DisplayContext.GameMenu.MainMenu, 0); 
 
@@ -41,7 +47,6 @@ namespace JavaGameButCSharp
     
             RenderTileMap(tileLayer);
             RenderObjectMap(objectLayer);
-
         
             this.Loaded += MainWindow_Loaded;
         }
@@ -54,6 +59,8 @@ namespace JavaGameButCSharp
                 Width = 147,
                 Height = 157
             };
+
+            DisplayContext.Boundary.OccupyGrid(300, 400, 147, 157);
 
             Canvas.SetLeft(theHouse, 300);
             Canvas.SetTop(theHouse, 400);
