@@ -13,6 +13,7 @@ namespace JavaGameButCSharp
         public System.Windows.Point Position { get; private set; }
         private Canvas canvas;
         private System.Windows.Controls.Image imageControl;
+        private Boundary _boundary;
 
         // Animation properties
         private int frameWidth;
@@ -26,11 +27,12 @@ namespace JavaGameButCSharp
             canvas.Children.Remove(imageControl);
         }
 
-        public Sprite(string imagePath, System.Windows.Point initialPosition, Canvas canvas, int frameCount = 1, int frameWidth = 0, int frameHeight = 0)
+        public Sprite(string imagePath, System.Windows.Point initialPosition, Canvas canvas,Boundary boundary, int frameCount = 1, int frameWidth = 0, int frameHeight = 0)
         {
             this.canvas = canvas;
             Position = initialPosition;
             this.frameCount = frameCount;
+            this._boundary = boundary;
             this.frameWidth = frameWidth > 0 ? frameWidth : (int)new BitmapImage(new Uri(imagePath, UriKind.Absolute)).PixelWidth / frameCount;
             this.frameHeight = frameHeight > 0 ? frameHeight : (int)new BitmapImage(new Uri(imagePath, UriKind.Absolute)).PixelHeight;
 
@@ -140,9 +142,14 @@ namespace JavaGameButCSharp
 
         public void Move(int deltaX, int deltaY)
         {
-            Position = new System.Windows.Point(Position.X + deltaX, Position.Y + deltaY);
-            Canvas.SetLeft(imageControl, Position.X);
-            Canvas.SetTop(imageControl, Position.Y);
+            System.Windows.Point NewPosition = new System.Windows.Point(Position.X + deltaX, Position.Y + deltaY);
+
+            if(_boundary.Walkable(NewPosition.X, NewPosition.Y)){
+                Canvas.SetLeft(imageControl, NewPosition.X);
+                Canvas.SetTop(imageControl, NewPosition.Y);
+
+                Position = NewPosition;
+            }
         }
     }
 }
