@@ -58,6 +58,7 @@ namespace JavaGameButCSharp{
                     @"C:\Walk.png", 
                     new System.Windows.Point(100, 100), 
                     _displayContext.GameCanvas, 
+                    _displayContext.Boundary,
                     frameCount: 6, 
                     frameWidth: 42, 
                     frameHeight: 42
