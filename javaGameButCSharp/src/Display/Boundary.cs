@@ -13,6 +13,14 @@ namespace JavaGameButCSharp{
             _boundaryGrid = new int[_rows, _cols];
         }
 
+        public bool IsBoundary(double tileX, double tileY){
+            if (tileX <= 0 || tileY <= 0 || tileX >= _cols-1 || tileY >= _rows-1) {
+                return true; 
+            }
+
+            return false;
+        }
+
         public void OccupyGrid(int x, int y, int width, int height){
             int tileX = x/_tileSize;
             int tileY = y/_tileSize;
@@ -31,7 +39,7 @@ namespace JavaGameButCSharp{
             int tileX = (int)Math.Round(x/_tileSize);
             int tileY = (int)Math.Round(y/_tileSize);
 
-            if (tileX < 0 || tileY < 0 || tileX >= _cols || tileY >= _rows) {
+            if (tileX < 0 || tileY < 0 || tileX >= _cols+1 || tileY >= _rows+1) {
                 return false; 
             }
             
