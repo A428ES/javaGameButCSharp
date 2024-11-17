@@ -2,7 +2,7 @@ using System.Windows;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{
-    public class Engine{
+    class Engine{
         private readonly EventController _eventController;
         private readonly GameStateController _gameState;
         DisplayContext _displayContext;
