@@ -3,17 +3,17 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace JavaGameButCSharp{
-    public class EngineMenu{
+    public class GameMenu{
         public Menu MainMenu {get;set;}
         private Dispatcher _dispatcher;
         public RoutedEventHandler converter {get;set;}
 
-        public EngineMenu(Dispatcher dispatcher){
+        public GameMenu(Dispatcher dispatcher){
             MainMenu = new ();
             _dispatcher = dispatcher;
         }
 
-        public void LoadMenuStack(string header, Dictionary<OptionMap, Action> MenuStack){
+        public void RefreshMenuStack(string header, Dictionary<OptionMap, Action> MenuStack){
             _dispatcher.Invoke(() =>
             {
                 MainMenu.Items.Clear();
