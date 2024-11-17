@@ -1,6 +1,3 @@
-using System;
-using System.Windows.Forms;
-
 public class InputDialog : Form
 {
     private TextBox textBoxInput;
@@ -14,37 +11,32 @@ public class InputDialog : Form
     {
         InitializeComponent(prompt);
     }
-
+    
     private void InitializeComponent(string prompt)
     {
-        // Initialize Label
         labelPrompt = new Label();
         labelPrompt.Text = prompt;
         labelPrompt.Location = new System.Drawing.Point(10, 10);
         labelPrompt.AutoSize = true;
         this.Controls.Add(labelPrompt);
 
-        // Initialize TextBox
         textBoxInput = new TextBox();
         textBoxInput.Location = new System.Drawing.Point(10, 40);
         textBoxInput.Width = 200;
         this.Controls.Add(textBoxInput);
 
-        // Initialize OK Button
         buttonOK = new Button();
         buttonOK.Text = "OK";
         buttonOK.Location = new System.Drawing.Point(10, 80);
         buttonOK.Click += new EventHandler(buttonOK_Click);
         this.Controls.Add(buttonOK);
 
-        // Initialize Cancel Button
         buttonCancel = new Button();
         buttonCancel.Text = "Cancel";
         buttonCancel.Location = new System.Drawing.Point(120, 80);
         buttonCancel.Click += new EventHandler(buttonCancel_Click);
         this.Controls.Add(buttonCancel);
 
-        // Set up form properties
         this.ClientSize = new System.Drawing.Size(230, 120);
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.StartPosition = FormStartPosition.CenterScreen;
