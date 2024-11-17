@@ -92,7 +92,7 @@ namespace JavaGameButCSharp
 
         private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            int moveDistance = 2;
+            int moveDistance = 10;
 
             switch (e.Key)
             {
@@ -122,7 +122,6 @@ namespace JavaGameButCSharp
             currentFrame = (currentFrame + 1) % frameCount; // Loop through frames
             int xOffset = currentFrame * frameWidth;
 
-            // Update the displayed frame
             imageControl.Source = new CroppedBitmap(ImageSource, new Int32Rect(xOffset, 0, frameWidth, frameHeight));
         }
 
