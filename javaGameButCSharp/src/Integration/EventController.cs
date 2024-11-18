@@ -56,7 +56,7 @@ namespace JavaGameButCSharp{
 
             if(!_gameState.ActivePlayer.Name.Equals("") && !_displayContext.PlayerLoaded()){
                 _displayContext.SpawnPlayer();
-            } else if(_displayContext.PlayerLoaded()) {
+            } else if(_gameState.ActivePlayer.Name.Equals("") && _displayContext.PlayerLoaded()) {
                 _displayContext.DestroyPlayer();
             }
         }

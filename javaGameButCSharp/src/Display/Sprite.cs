@@ -1,71 +1,146 @@
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using Image = System.Windows.Controls.Image;
+using Point = System.Windows.Point;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace JavaGameButCSharp
 {
     public class Sprite
     {
-        public BitmapImage ImageSource { get; private set; }
-        public System.Windows.Point Position { get; private set; }
-        private Canvas canvas;
-        private System.Windows.Controls.Image imageControl;
+        private BitmapImage _imageSource { get; }
+        private Point _position { get; set; }
+        private Canvas _canvas;
+        private Image _imageControl;
         private Boundary _boundary;
+        private int _frameWidth;
+        private int _frameHeight;
+        private int _frameCount;
+        private int _currentFrame;
+        private DispatcherTimer _animationTimer;
 
-        // Animation properties
-        private int frameWidth;
-        private int frameHeight;
-        private int frameCount;
-        private int currentFrame;
-        private System.Windows.Threading.DispatcherTimer animationTimer;
-
+        public Sprite(string imagePath, Canvas canvas, Boundary boundary)
+        {
+            _canvas = canvas;
+            _boundary = boundary;
+            _imageSource = new BitmapImage(new Uri(imagePath, UriKind.Absolute));
+            
+            FrameDimensions();
+        }
         public void DestroySprite()
         {
-            canvas.Children.Remove(imageControl);
+            _canvas.Children.Remove(_imageControl);
         }
 
-        public Sprite(string imagePath, System.Windows.Point initialPosition, Canvas canvas,Boundary boundary, int frameCount = 1, int frameWidth = 0, int frameHeight = 0)
+        public Sprite FrameDimensions(int frameWidth = 32, int frameHeight = 32, int frameCount = 1){
+            _frameCount = frameCount;
+            _frameWidth = frameWidth > 0 ? frameWidth : (int)_imageSource.PixelWidth / frameCount;
+            _frameHeight = frameHeight > 0 ? frameHeight : (int)_imageSource.PixelHeight;
+
+            return this;
+        }
+
+        public void CreateImage(bool cropped=false){
+            _imageControl = new Image
+                {
+                    Source = _imageSource,
+                    Width = _frameWidth,
+                    Height = _frameHeight
+                };
+
+            if(cropped){
+                _imageControl.Source = new CroppedBitmap(_imageSource, new Int32Rect(0, 0, _frameWidth, _frameHeight));
+            }
+        }
+
+        public Sprite SetPosition(int x, int y){
+            _position = new Point(x, y);
+
+            return this;
+        }
+
+        public Sprite RenderSprite(bool crop=false){
+            CreateImage(crop);
+
+            Canvas.SetLeft(_imageControl, _position.X);
+            Canvas.SetTop(_imageControl, _position.Y);
+            _canvas.Children.Add(_imageControl);
+
+            return this;
+        }
+
+        public Sprite AttachAnimation(){
+            _animationTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(100) 
+            };
+
+            _animationTimer.Tick += UpdateFrame;
+            
+            return this;
+        }
+
+        public Sprite AttachKeyControl(){
+            _canvas.KeyDown += OnKeyDown;
+            _canvas.KeyUp += OnKeyUp;
+            _canvas.Focusable = true;
+            _canvas.Focus();
+
+            return this;
+        }
+
+        private void SpriteOrientation(int x, int y){
+
+            var flipTransform = new ScaleTransform
+            {
+                ScaleX = x,
+                ScaleY = y,
+            };
+
+            _imageControl.RenderTransform = flipTransform;
+            _imageControl.RenderTransformOrigin = new Point(0.5, 0.5); 
+        }
+
+        private void UpdateFrame(object sender, EventArgs e)
         {
-            this.canvas = canvas;
-            Position = initialPosition;
-            this.frameCount = frameCount;
-            this._boundary = boundary;
-            this.frameWidth = frameWidth > 0 ? frameWidth : (int)new BitmapImage(new Uri(imagePath, UriKind.Absolute)).PixelWidth / frameCount;
-            this.frameHeight = frameHeight > 0 ? frameHeight : (int)new BitmapImage(new Uri(imagePath, UriKind.Absolute)).PixelHeight;
+            _currentFrame = (_currentFrame + 1) % _frameCount; 
+            int xOffset = _currentFrame * _frameWidth;
 
-            ImageSource = new BitmapImage(new Uri(imagePath, UriKind.Absolute));
-
-            // Create the Image control to display the sprite
-            imageControl = new System.Windows.Controls.Image
-            {
-                Source = new CroppedBitmap(ImageSource, new Int32Rect(0, 0, this.frameWidth, this.frameHeight)),
-                Width = this.frameWidth,
-                Height = this.frameHeight
-            };
-
-            // Set initial position and add sprite to canvas
-            Canvas.SetLeft(imageControl, Position.X);
-            Canvas.SetTop(imageControl, Position.Y);
-            canvas.Children.Add(imageControl);
-
-            // Initialize animation timer
-            animationTimer = new System.Windows.Threading.DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(100) // Adjust frame timing
-            };
-            animationTimer.Tick += UpdateFrame;
-
-            // Register the KeyDown event handler directly in the Sprite class
-            canvas.KeyDown += OnKeyDown;
-            canvas.KeyUp += OnKeyUp;
-            canvas.Focusable = true;
-            canvas.Focus();
+            _imageControl.Source = new CroppedBitmap(_imageSource, new Int32Rect(xOffset, 0, _frameWidth, _frameHeight));
         }
 
-        private void OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        public void StartAnimation()
+        {
+            if (!_animationTimer.IsEnabled)
+                _animationTimer.Start();
+        }
+
+        public void StopAnimation()
+        {
+            if (_animationTimer.IsEnabled)
+                _animationTimer.Stop();
+            
+            _currentFrame = 0; 
+            _imageControl.Source = new CroppedBitmap(_imageSource, new Int32Rect(0, 0, _frameWidth, _frameHeight));
+        }
+
+        public void Move(int deltaX, int deltaY)
+        {
+            Point NewPosition = new Point(_position.X + deltaX, _position.Y + deltaY);
+
+            if(_boundary.Walkable(NewPosition.X, NewPosition.Y)){
+                Canvas.SetLeft(_imageControl, NewPosition.X);
+                Canvas.SetTop(_imageControl, NewPosition.Y);
+
+                _position = NewPosition;
+            }
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -78,19 +153,7 @@ namespace JavaGameButCSharp
             }
         }
 
-        private void SpriteOrientation(int x, int y){
-
-            var flipTransform = new ScaleTransform
-            {
-                ScaleX = x,
-                ScaleY = y,  
-            };
-
-            imageControl.RenderTransform = flipTransform;
-            imageControl.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5); 
-        }
-
-        private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void OnKeyDown(object sender, KeyEventArgs e)
         {
             int moveDistance = 10;
 
@@ -114,40 +177,6 @@ namespace JavaGameButCSharp
                     StartAnimation();
                     Move(moveDistance, 0);
                     break;
-            }
-        }
-
-        private void UpdateFrame(object sender, EventArgs e)
-        {
-            currentFrame = (currentFrame + 1) % frameCount; // Loop through frames
-            int xOffset = currentFrame * frameWidth;
-
-            imageControl.Source = new CroppedBitmap(ImageSource, new Int32Rect(xOffset, 0, frameWidth, frameHeight));
-        }
-
-        public void StartAnimation()
-        {
-            if (!animationTimer.IsEnabled)
-                animationTimer.Start();
-        }
-
-        public void StopAnimation()
-        {
-            if (animationTimer.IsEnabled)
-                animationTimer.Stop();
-            currentFrame = 0; // Reset to the first frame
-            imageControl.Source = new CroppedBitmap(ImageSource, new Int32Rect(0, 0, frameWidth, frameHeight));
-        }
-
-        public void Move(int deltaX, int deltaY)
-        {
-            System.Windows.Point NewPosition = new System.Windows.Point(Position.X + deltaX, Position.Y + deltaY);
-
-            if(_boundary.Walkable(NewPosition.X, NewPosition.Y)){
-                Canvas.SetLeft(imageControl, NewPosition.X);
-                Canvas.SetTop(imageControl, NewPosition.Y);
-
-                Position = NewPosition;
             }
         }
     }

@@ -6,7 +6,11 @@ namespace JavaGameButCSharp{
         public GameRenderer Renderer { get; } = gameRenderer;
 
         public void SpawnPlayer(){
-            Renderer.RenderPlayerSprite(@"C:\Walk.PNG");
+            if(PlayerLoaded()){
+                return;
+            }
+
+            _playerSprite = Renderer.RenderPlayerSprite(@"C:\Walk.PNG");
             _npcSprites = new();
         }
 
@@ -20,8 +24,11 @@ namespace JavaGameButCSharp{
 
         public void DestroyPlayer(){
             if(!PlayerLoaded()){
-                Renderer.DestroySprite(_playerSprite);
+                return ;
             }
+
+            Renderer.DestroySprite(_playerSprite);
+            _playerSprite = null;
         }
 
         public void UpdateMenu(Dictionary<OptionMap, Action> menuMap){
