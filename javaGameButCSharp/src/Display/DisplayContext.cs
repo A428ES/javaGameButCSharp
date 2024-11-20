@@ -4,6 +4,9 @@ namespace JavaGameButCSharp{
         private Sprite _playerSprite;
         private List<Sprite> _npcSprites;
         public GameRenderer Renderer { get; } = gameRenderer;
+        public Action UnpauseGame {get;set;}
+        public Action PauseGame {get;set;}
+
 
         public void SpawnPlayer(){
             if(PlayerLoaded()){

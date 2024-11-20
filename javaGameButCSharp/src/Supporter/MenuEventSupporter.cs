@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media.Animation;
 using static JavaGameButCSharp.OptionMap;
 
 namespace JavaGameButCSharp{

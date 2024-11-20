@@ -55,9 +55,18 @@ namespace JavaGameButCSharp{
             CurrentEvent = _eventSupporter.NextEvent;
 
             if(!_gameState.ActivePlayer.Name.Equals("") && !_displayContext.PlayerLoaded()){
-                _displayContext.SpawnPlayer();
+                string statusMsg = $"[Name: {_gameState.ActivePlayer.Name}] [Health: {_gameState.ActivePlayer.Health}]";
+
+                _displayContext.SpawnPlayer(); 
+                _displayContext.Renderer.ActivityController.UnPauseGame();
+
+                _displayContext.Renderer.StatusBar.UpdatePlayerStats(statusMsg);
             } else if(_gameState.ActivePlayer.Name.Equals("") && _displayContext.PlayerLoaded()) {
                 _displayContext.DestroyPlayer();
+                _displayContext.Renderer.ActivityController.PauseGame();
+            } else if(_gameState.ActivePlayer.Name.Equals("") && !_displayContext.PlayerLoaded()) {
+                _displayContext.Renderer.ActivityController.PauseGame();
+                _displayContext.Renderer.StatusBar.UpdatePlayerStats("No player logged in.");
             }
         }
 

@@ -10,7 +10,7 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace JavaGameButCSharp
 {
-    public class Sprite
+    class Sprite
     {
         private BitmapImage _imageSource { get; }
         private Point _position { get; set; }
@@ -22,12 +22,17 @@ namespace JavaGameButCSharp
         private int _frameCount;
         private int _currentFrame;
         private DispatcherTimer _animationTimer;
+        private DispatcherTimer _autoWalkTimer;
+        private int _autoWalkDirection = 1;
+        public GameActivityController _activityController {get; private set;}
+        private static readonly Random RandMove = new Random();
 
-        public Sprite(string imagePath, Canvas canvas, Boundary boundary)
+        public Sprite(string imagePath, Canvas canvas, Boundary boundary, GameActivityController activityController)
         {
             _canvas = canvas;
             _boundary = boundary;
             _imageSource = new BitmapImage(new Uri(imagePath, UriKind.Absolute));
+            _activityController = activityController;
             
             FrameDimensions();
         }
@@ -73,7 +78,8 @@ namespace JavaGameButCSharp
             return this;
         }
 
-        public Sprite AttachAnimation(){
+        public Sprite AttachAnimation()
+        {
             _animationTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromMilliseconds(100) 
@@ -84,7 +90,8 @@ namespace JavaGameButCSharp
             return this;
         }
 
-        public Sprite AttachKeyControl(){
+        public Sprite AttachKeyControl()
+        {
             _canvas.KeyDown += OnKeyDown;
             _canvas.KeyUp += OnKeyUp;
             _canvas.Focusable = true;
@@ -93,8 +100,42 @@ namespace JavaGameButCSharp
             return this;
         }
 
-        private void SpriteOrientation(int x, int y){
+        public void AutoWalker(object sender, EventArgs e)
+        {
+            if(!_canvas.IsEnabled)
+            {
+                StopAnimation();
+                return;
+            }
 
+            int swapAxis = RandMove.Next(0, 25);
+
+            if(swapAxis == 14){
+                switch(Math.Abs(_autoWalkDirection)){
+                    case 1:
+                        _autoWalkDirection = 2;
+                        break;
+                    case 2:
+                        _autoWalkDirection = 1;
+                        break;
+                }
+            }
+
+            MovementRouter(_autoWalkDirection, 10);
+        }
+
+        public Sprite AttachAutoWalker()
+        {
+            _autoWalkTimer = new DispatcherTimer();
+            _autoWalkTimer.Interval = TimeSpan.FromSeconds(0.15); // Set interval to 1000ms (1 second)
+            _autoWalkTimer.Tick += AutoWalker;
+            _autoWalkTimer.Start();
+
+            return this;
+        }
+
+        private void SpriteOrientation(int x, int y)
+        {
             var flipTransform = new ScaleTransform
             {
                 ScaleX = x,
@@ -119,13 +160,15 @@ namespace JavaGameButCSharp
                 _animationTimer.Start();
         }
 
-        public void StopAnimation()
+        public void StopAnimation(bool resetToFirstFrame=false)
         {
             if (_animationTimer.IsEnabled)
                 _animationTimer.Stop();
             
-            _currentFrame = 0; 
-            _imageControl.Source = new CroppedBitmap(_imageSource, new Int32Rect(0, 0, _frameWidth, _frameHeight));
+            if (resetToFirstFrame){
+                _currentFrame = 0;
+                _imageControl.Source = new CroppedBitmap(_imageSource, new Int32Rect(0, 0, _frameWidth, _frameHeight));
+            }
         }
 
         public void Move(int deltaX, int deltaY)
@@ -137,6 +180,8 @@ namespace JavaGameButCSharp
                 Canvas.SetTop(_imageControl, NewPosition.Y);
 
                 _position = NewPosition;
+            } else {
+                _autoWalkDirection *= -1;
             }
         }
 
@@ -149,6 +194,34 @@ namespace JavaGameButCSharp
                 case Key.S:
                 case Key.D:
                     StopAnimation();
+                    break;                    
+            }
+        }
+
+        public void MovementRouter(int direction, int moveDistance){
+            if(!_activityController.IsActive){
+                return;
+            }
+            
+            switch (direction)
+            {
+                case -1:
+                    StartAnimation();
+                    Move(0, -moveDistance);
+                    break;
+                case 1:
+                    StartAnimation();
+                    Move(0, moveDistance);
+                    break;
+                case -2:
+                    SpriteOrientation(-1, 1);
+                    StartAnimation();
+                    Move(-moveDistance, 0);
+                    break;
+                case 2:
+                    SpriteOrientation(1, 1);
+                    StartAnimation();
+                    Move(moveDistance, 0);
                     break;
             }
         }
@@ -160,23 +233,21 @@ namespace JavaGameButCSharp
             switch (e.Key)
             {
                 case Key.W:
-                    StartAnimation();
-                    Move(0, -moveDistance);
+                    MovementRouter(-1, moveDistance);
                     break;
                 case Key.S:
-                    StartAnimation();
-                    Move(0, moveDistance);
+                    MovementRouter(1, moveDistance);
                     break;
                 case Key.A:
-                    SpriteOrientation(-1, 1);
-                    StartAnimation();
-                    Move(-moveDistance, 0);
+                    MovementRouter(-2, moveDistance);
                     break;
                 case Key.D:
-                    SpriteOrientation(1, 1);
-                    StartAnimation();
-                    Move(moveDistance, 0);
+                    MovementRouter(2, moveDistance);
                     break;
+                case Key.Space:
+                    _activityController.ToggleState();
+                    break;
+
             }
         }
     }
