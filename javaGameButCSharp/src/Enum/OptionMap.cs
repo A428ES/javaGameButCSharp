@@ -34,6 +34,12 @@ namespace JavaGameButCSharp{
         WEAPONS,
         INVENTORY_EVENT, 
         ACTIVATE,
-        DROP, LOGOUT
+        DROP, 
+        LOGOUT,
+        INTERSECTION,
+        WALKABLE, 
+        OCCUPIED,
+        BOUNDARY,
+        NOCHANGE
     }
 }

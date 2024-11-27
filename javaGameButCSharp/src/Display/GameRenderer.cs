@@ -1,25 +1,23 @@
 using System.Windows.Controls;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Windows.Controls.Primitives;
 
 namespace JavaGameButCSharp
 {
 
     class GameRenderer
     {
+        private Grid _mainGrid;
+        public Grid MainGrid => _mainGrid;
         public Canvas _backgroundCanvas {get;}
         public Canvas _objectCanvas {get;}
         public Canvas _entityCanvas {get;}
         public GameMenu GameMenu {get;}
-        public Boundary _boundaryHandler {get;set;}
-        public Grid mainGrid;
+        public RenderService RenderServiceSupport {get;}
+        public GameStatusBar StatusBar;
         public double Height;
         public double Width;
         public int PixelSize;
-        public GameStatusBar StatusBar;
-        public GameActivityController ActivityController;
 
         public GameRenderer(double height, double width, int pixelSize, Dispatcher dispatcher, GameActivityController activityController){
             _backgroundCanvas = new();
@@ -29,13 +27,15 @@ namespace JavaGameButCSharp
             Height = height;
             Width = width;
             PixelSize = pixelSize;
+
             GameMenu = new(dispatcher);
             StatusBar = new GameStatusBar(dispatcher);
-            ActivityController = activityController;
+            _mainGrid = new Grid();
 
-            ActivityController.SetStatusBar(StatusBar);
+            RenderServiceSupport = new(Height, Width, PixelSize, activityController);
+            RenderServiceSupport.ActivityController.SetStatusBar(StatusBar);
+
             GenerateGrid();
-            GenerateBoundary();
         }
 
         public double WindowHeight(){
@@ -46,17 +46,10 @@ namespace JavaGameButCSharp
             return 814;
         }
 
-        public void GenerateBoundary(){
-            _boundaryHandler = new(Height, Width, PixelSize);
-            _boundaryHandler.BuildGrid();
-        }
-
         public void GenerateGrid(){
-            mainGrid = new Grid();
-
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); 
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star)});
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            _mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); 
+            _mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star)});
+            _mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             Grid.SetRow(GameMenu.MainMenu, 0); 
             Grid.SetRow(_backgroundCanvas, 1); 
@@ -64,49 +57,37 @@ namespace JavaGameButCSharp
             Grid.SetRow(_entityCanvas, 1); 
             Grid.SetRow(StatusBar.StatusBar, 2);
 
-            mainGrid.Children.Add(GameMenu.MainMenu);
-            mainGrid.Children.Add(_backgroundCanvas);
-            mainGrid.Children.Add(_objectCanvas);
-            mainGrid.Children.Add(_entityCanvas);
-            mainGrid.Children.Add(StatusBar.StatusBar);
+            _mainGrid.Children.Add(GameMenu.MainMenu);
+            _mainGrid.Children.Add(_backgroundCanvas);
+            _mainGrid.Children.Add(_objectCanvas);
+            _mainGrid.Children.Add(_entityCanvas);
+            _mainGrid.Children.Add(StatusBar.StatusBar);
         }
 
         public Sprite RenderPlayerSprite(string imagePath){
-                return new Sprite(imagePath, _entityCanvas, _boundaryHandler, ActivityController)
-                                .SetPosition(100, 100)
-                                .FrameDimensions(42, 42, 6)
-                                .AttachAnimation()
-                                .AttachKeyControl()
-                                .RenderSprite(true);
+            return new Player(imagePath, _entityCanvas, new(100, 100), RenderServiceSupport).RenderSprite(true);;
         }
 
         public Sprite RenderNPCSprite(string imagePath){
-            return new Sprite(imagePath, _objectCanvas, _boundaryHandler, ActivityController)
-                            .SetPosition(400, 400)
-                            .FrameDimensions(42, 42, 6)
-                            .AttachAnimation()
-                            .AttachAutoWalker()
-                            .RenderSprite(true);
+            return new NPC(imagePath, _objectCanvas, new(125, 110), RenderServiceSupport).RenderSprite(true);
         }
 
         public void DestroySprite(Sprite spriteToDestroy){
             if(spriteToDestroy == null){
                 return;
             }
-            
-            spriteToDestroy.DestroySprite();
+
+            spriteToDestroy.Remove();
         }
         
         public void RenderObjectMap()
         {
-            Sprite houseObject = new Sprite(imagePath: @"C:\3.png",_objectCanvas,_boundaryHandler, ActivityController)
-                                            .SetPosition(300, 200)
-                                            .FrameDimensions(147, 157)
-                                            .RenderSprite();
+            Sprite houseSpawn = new StationarySprite(imagePath: @"C:\3.png",_objectCanvas, RenderServiceSupport)
+                                                    .FrameDimensions(147, 157)
+                                                    .SetPosition(new(300, 200))
+                                                    .RenderSprite(walkable: false);
 
             RenderNPCSprite(@"C:\NPCWalk.png");
-
-            _boundaryHandler.OccupyGrid(300, 200, 147, 157);
         }
 
         public void RenderTileMap()
@@ -115,17 +96,18 @@ namespace JavaGameButCSharp
             int tileHeight = 32;
             int rows = (int)(this.Height / tileHeight);
             int cols = (int)(this.Width / tileWidth);
-            Sprite backgroundTile = new Sprite(@"C:\FieldsTile_01.png", _backgroundCanvas, _boundaryHandler, ActivityController);
-            Sprite borderTile = new Sprite(@"C:\Tile2_60.png", _objectCanvas, _boundaryHandler, ActivityController);
+            
+            Sprite backgroundTile = new StationarySprite (@"C:\FieldsTile_01.png", _backgroundCanvas, RenderServiceSupport);
+            Sprite borderTile = new StationarySprite (@"C:\Tile2_60.png", _backgroundCanvas, RenderServiceSupport);
 
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    backgroundTile.SetPosition(col * tileWidth, row * tileHeight).RenderSprite();
+                    backgroundTile.SetPosition(new(col * tileWidth, row * tileHeight)).RenderSprite();
 
-                    if(_boundaryHandler.IsBoundary(col, row)){
-                        borderTile.SetPosition(col * tileWidth, row * tileHeight).RenderSprite();
+                    if(RenderServiceSupport.BoundaryService.IsBoundary(col, row)){
+                        borderTile.SetPosition(new(col * tileWidth, row * tileHeight)).RenderSprite();
                     }
                 }
             }

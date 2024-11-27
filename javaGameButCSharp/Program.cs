@@ -25,11 +25,11 @@ namespace JavaGameButCSharp
 
             DisplayContext = new(gameRenderer);
 
-            this.Content = gameRenderer.mainGrid;
+            this.Content = gameRenderer.MainGrid;
             this.Loaded += MainWindow_Loaded;
             this.SizeChanged += OnWindowSizeChanged;
         }
-
+        
         private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
         {
             DisplayContext.Renderer.StatusBar.UpdateGameDimensions($"Window Size: {this.ActualWidth:F0} x {this.ActualHeight:F0}");
